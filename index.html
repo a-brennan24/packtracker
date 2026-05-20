@@ -18,9 +18,10 @@
         .badge-Low { background: #fef9c3; color: #854d0e; border-color: #fef08a; }
         .badge-Out { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
         .badge-Unknown { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+        .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
     </style>
 </head>
-<body class="breeze-bg text-slate-800 pb-24">
+<body class="breeze-bg text-slate-800 pb-24" onclick="closeAllDropdownsGlobal(event)">
 
     <!-- App Header Navbar -->
     <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
@@ -41,18 +42,17 @@
                 <input type="text" id="globalSearchInput" oninput="runGlobalSearch()" placeholder="Type a store or set name (e.g. Smyths, Mega, 151)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
             </div>
             
-            <!-- Dynamic search outputs container grid -->
             <div id="searchResultsContainer" class="space-y-2 pt-1"></div>
         </div>
 
         <!-- SECTION 2: LOG LOGS & BROADCAST NEW SHELF FILE UPDATES -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4" onclick="event.stopPropagation()">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">📝 Log a Shelf Report</h2>
             
             <!-- Store Selector Bar -->
             <div class="relative">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">1. Select Store Location</label>
-                <input type="text" id="storeSearchInput" oninput="filterStoreFormSearch()" onblur="hideStoreResultsDelayed()" placeholder="Type store name or town..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                <input type="text" id="storeSearchInput" oninput="filterStoreFormSearch()" onfocus="filterStoreFormSearch()" placeholder="Type store name or town..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
                 <div id="storeSearchResults" class="search-results-box hidden"></div>
             </div>
 
@@ -82,7 +82,7 @@
             <!-- TCG Set Search Filter Bar -->
             <div class="relative">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">4. Select TCG Expansion Set</label>
-                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" onblur="hideSetResultsDelayed()" placeholder="Search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" onfocus="filterGlobalSetSearch()" placeholder="Search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
                 <div id="setSearchResults" class="search-results-box hidden"></div>
             </div>
 
@@ -106,7 +106,6 @@
     </main>
 
     <script>
-        // Master store location index array datalog keys
         let localStores = JSON.parse(localStorage.getItem('pt_stores')) || [
             { key: "smyths-cork", name: "Smyths Toys Kinsale Rd (Cork)" },
             { key: "tesco-midleton", name: "Tesco Superstore Midleton" },
@@ -128,7 +127,6 @@
             { id: 1, storeKey: "smyths-cork", set: "Pokémon: Mega Evolution Perfect Order", status: "Low", note: "Hanger racks filled behind customer service.", flags: 0, time: "Just now" }
         ];
 
-        // SECTION 1 ENGINE: Instant search lookup filter logic maps both parameters simultaneously
         function runGlobalSearch() {
             const query = document.getElementById('globalSearchInput').value.toLowerCase();
             const container = document.getElementById('searchResultsContainer');
@@ -136,7 +134,6 @@
 
             if(!query) return;
 
-            // Gather any reports matching the store text or set name string queries
             const filteredReports = reports.filter(r => {
                 const storeObj = localStores.find(s => s.key === r.storeKey);
                 const storeName = storeObj ? storeObj.name.toLowerCase() : '';
@@ -176,7 +173,6 @@
             const resultsBox = document.getElementById('storeSearchResults');
             resultsBox.innerHTML = '';
             
-            if(!query) { resultsBox.classList.add('hidden'); return; }
             resultsBox.classList.remove('hidden');
 
             const filtered = localStores.filter(s => s.name.toLowerCase().includes(query));
@@ -184,7 +180,8 @@
                 const row = document.createElement('div');
                 row.className = "search-item";
                 row.innerText = store.name;
-                row.onmousedown = () => {
+                row.onclick = (e) => {
+                    e.stopPropagation(); // Stops event bubbling issues completely
                     document.getElementById('storeSearchInput').value = store.name;
                     selectedStoreKey = store.key;
                     resultsBox.classList.add('hidden');
@@ -192,12 +189,12 @@
                 resultsBox.appendChild(row);
             });
 
-            // SECTION 2 DYNAMIC FEATURE: Add new custom store immediately on text submission input
-            if(filtered.length === 0) {
+            if(filtered.length === 0 && query.length > 0) {
                 const addRow = document.createElement('div');
                 addRow.className = "search-item text-teal-600 font-bold";
                 addRow.innerText = `➕ Add New Location: "${document.getElementById('storeSearchInput').value}"`;
-                addRow.onmousedown = () => {
+                addRow.onclick = (e) => {
+                    e.stopPropagation();
                     const name = document.getElementById('storeSearchInput').value;
                     const key = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
                     const newStore = { key: key, name: name };
@@ -212,10 +209,6 @@
             }
         }
 
-        function hideStoreResultsDelayed() {
-            setTimeout(() => { document.getElementById('storeSearchResults').classList.add('hidden'); }, 200);
-        }
-
         function onGameSystemChange() {
             document.getElementById('setSearchInput').value = "";
             selectedSetName = "";
@@ -227,7 +220,6 @@
             const resultsBox = document.getElementById('setSearchResults');
             resultsBox.innerHTML = '';
             
-            if(!query) { resultsBox.classList.add('hidden'); return; }
             resultsBox.classList.remove('hidden');
 
             const targetSetArray = cachedSetsDatabase[selectedSystem] || [];
@@ -237,7 +229,8 @@
                 const row = document.createElement('div');
                 row.className = "search-item";
                 row.innerText = setName;
-                row.onmousedown = () => {
+                row.onclick = (e) => {
+                    e.stopPropagation();
                     document.getElementById('setSearchInput').value = setName;
                     selectedSetName = setName;
                     resultsBox.classList.add('hidden');
@@ -245,11 +238,12 @@
                 resultsBox.appendChild(row);
             });
 
-            if(filtered.length === 0) {
+            if(filtered.length === 0 && query.length > 0) {
                 const manualRow = document.createElement('div');
                 manualRow.className = "search-item text-slate-500 italic";
                 manualRow.innerText = `Use custom input: "${document.getElementById('setSearchInput').value}"`;
-                manualRow.onmousedown = () => {
+                manualRow.onclick = (e) => {
+                    e.stopPropagation();
                     selectedSetName = document.getElementById('setSearchInput').value;
                     resultsBox.classList.add('hidden');
                 };
@@ -257,11 +251,12 @@
             }
         }
 
-        function hideSetResultsDelayed() {
-            setTimeout(() => { document.getElementById('setSearchResults').classList.add('hidden'); }, 200);
+        // NEW GLOBAL HANDLER: Tapping anywhere else on the screen forcefully drops the popup frames instantly
+        function closeAllDropdownsGlobal(e) {
+            document.getElementById('storeSearchResults').classList.add('hidden');
+            document.getElementById('setSearchResults').classList.add('hidden');
         }
 
-        // FEATURE: Flag inaccurate self-policing engine tracking metrics
         function flagReport(id) {
             const report = reports.find(r => r.id === id);
             if(report) {
