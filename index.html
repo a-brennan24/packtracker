@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PackTracker Ireland</title>
+    <!-- Tailwind CSS for clean theme styling -->
+    <script src="https://tailwindcss.com"></script>
+    <!-- Full Leaflet Map packages -->
+    <link rel="stylesheet" href="https://unpkg.com" />
+    <script src="https://unpkg.com"></script>
+    <style>
+        #map { height: 380px; width: 100%; z-index: 1; background: #cbd5e1; }
+        .breeze-bg { background-color: #f0fdfa; }
+    </style>
+</head>
+<body class="breeze-bg font-sans min-h-screen text-slate-800 pb-20">
+
+    <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
+            <span class="text-xs bg-teal-800 px-2 py-1 rounded-full font-medium">Community Driven</span>
+        </div>
+    </header>
+
+    <main class="max-w-md mx-auto p-4 space-y-4">
+        
+        <!-- Live Map Box -->
+        <div class="bg-white rounded-xl shadow-sm border border-teal-100 overflow-hidden">
+            <div class="p-3 bg-teal-50 border-b border-teal-100 flex justify-between items-center">
+                <h2 class="font-semibold text-teal-900">📍 Local Stock Map</h2>
+                <p class="text-xs text-slate-500">Tap pins to inspect shelves</p>
+            </div>
+            <div id="map"></div>
+        </div>
+
+        <!-- Submit Form Section -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-teal-100 space-y-3">
+            <h2 class="font-bold text-lg text-teal-900 flex items-center gap-2">📝 Log a Shelf Report</h2>
+            
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">1. Select Irish Store</label>
+                <select id="storeSelect" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                    <option value="tesco-bandon">Tesco Superstore (Bandon, Cork)</option>
+                    <option value="smyths-cork">Smyths Toys Superstores (Kinsale Rd, Cork)</option>
+                    <option value="comic-vault-cork">The Comic Vault (Oliver Plunkett St, Cork)</option>
+                </select>
+            </div>
+
+            <div class="grid grid-cols-2 gap-2">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">2. TCG Set</label>
+                    <select id="setSelect" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <option value="Pokémon: Temporal Forces">Pokémon: Temporal Forces</option>
+                        <option value="Pokémon: Shrouded Fable">Pokémon: Shrouded Fable</option>
+                        <option value="Pokémon: 151 Special Set">Pokémon: 151 Box</option>
+                        <option value="Lorcana: Inklands">Lorcana: Inklands</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">3. Shelf Level</label>
+                    <select id="statusSelect" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 font-semibold focus:ring-2 focus:ring-teal-500 focus:outline-none">
+                        <option value="Full" class="text-green-600">🟢 Full Stock</option>
+                        <option value="Low" class="text-yellow-600">🟡 Low Stock</option>
+                        <option value="Out" class="text-red-600">🔴 Out of Stock</option>
+                    </select>
+                </div>
+            </div>
+
+            <button onclick="submitReport()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition-colors shadow-md shadow-teal-100 active:scale-[0.98]">
+                Broadcast Live Update
+            </button>
+        </div>
+
+        <!-- Text Dashboard Feed -->
+        <div class="space-y-2">
+            <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider px-1">Live Feed Dashboard</h3>
+            <div id="feedContainer" class="space-y-2"></div>
+        </div>
+
+    </main>
+
+    <!-- App Logic Script -->
+    <script>
+        const storeLocations = {
+            "tesco-bandon": { name: "Tesco Superstore Bandon", lat: 51.7481, lng: -8.7324 },
+            "smyths-cork": { name: "Smyths Toys Kinsale Rd", lat: 51.8765, lng: -8.4712 },
+            "comic-vault-cork": { name: "The Comic Vault Cork", lat: 51.8975, lng: -8.4718 }
+        };
+
+        const map = L.map('map').setView([51.8200, -8.6000], 10);
+        
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            attribution: '© OpenStreetMap'
+        }).addTo(map);
+
+        let markerGroup = L.layerGroup().addTo(map);
+
+        let reports = JSON.parse(localStorage.getItem('tcg_reports')) || [
+            { id: 1, storeKey: "tesco-bandon", set: "Pokémon: Temporal Forces", status: "Full", time: "Just now" },
+            { id: 2, storeKey: "smyths-cork", set: "Pokémon: 151 Box", status: "Low", time: "1 hour ago" }
+        ];
+
+        function getStatusColor(status) {
+            if (status === 'Full') return '#16a34a';
+            if (status === 'Low') return '#ca8a04';
+            return '#dc2626';
+        }
+
+        function renderApp() {
+            markerGroup.clearLayers();
+            const feed = document.getElementById('feedContainer');
+            if(!feed) return;
+            feed.innerHTML = '';
+
+            const activeStoreStatus = {};
+
+            reports.forEach(report => {
+                activeStoreStatus[report.storeKey] = report;
+
+                const colorMap = { 'Full': 'text-green-800 bg-green-100', 'Low': 'text-yellow-800 bg-yellow-100', 'Out': 'text-red-800 bg-red-100' };
+                const dotMap = { 'Full': '🟢', 'Low': '🟡', 'Out': '🔴' };
+                
+                const card = document.createElement('div');
+                card.style.cssText = "background: white; padding: 14px; border-radius: 12px; border: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; box-shadow: 0 1px 2px rgba(0,0,0,0.05);";
+                card.innerHTML = `
+                    <div>
+                        <strong style="font-size: 14px; color: #1e293b;">${storeLocations[report.storeKey].name}</strong>
+                        <div style="font-size: 12px; color: #64748b; margin-top: 2px;">${report.set}</div>
+                    </div>
+                    <div style="text-align: right;">
+                        <span style="font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px;" class="${colorMap[report.status]}">${dotMap[report.status]} ${report.status}</span>
+                        <div style="font-size: 10px; color: #94a3b8; margin-top: 4px;">Updated: ${report.time}</div>
+                    </div>
+                `;
+                feed.prepend(card);
+            });
+
+            Object.keys(storeLocations).forEach(key => {
+                const store = storeLocations[key];
+                const activeReport = activeStoreStatus[key];
+                
+                let popupContent = `<b>${store.name}</b><br><span style="color: #64748b; font-size: 11px;">No stock reports logged yet.</span>`;
+                let pinColor = '#94a3b8';
+
+                if (activeReport) {
+                    pinColor = getStatusColor(activeReport.status);
+                    popupContent = `
+                        <div style="font-family: sans-serif;">
+                            <b style="font-size: 13px; color: #1e293b;">${store.name}</b><br>
+                            <span style="font-size: 11px; font-weight: bold; color: ${pinColor}">
+                                ${activeReport.status === 'Full' ? '🟢 Full' : activeReport.status === 'Low' ? '🟡 Low' : '🔴 Out'} : ${activeReport.set}
+                            </span><br>
+                            <span style="font-size: 10px; color: #94a3b8;">Last updated: ${activeReport.time}</span>
+                        </div>
+                    `;
+                }
+
+                L.circleMarker([store.lat, store.lng], {
+                    radius: 10,
+                    fillColor: pinColor,
+                    color: '#ffffff',
+                    weight: 2,
+                    fillOpacity: 0.9
+                }).addTo(markerGroup).bindPopup(popupContent);
+            });
+        }
+
+        function submitReport() {
+            const storeKey = document.getElementById('storeSelect').value;
+            const set = document.getElementById('setSelect').value;
+            const status = document.getElementById('statusSelect').value;
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' });
+
+            const newReport = {
+                id: Date.now(),
+                storeKey: storeKey,
+                set: set,
+                status: status,
+                time: timeString
+            };
+
+            reports.push(newReport);
+            localStorage.setItem('tcg_reports', JSON.stringify(reports));
+            renderApp();
+        }
+
+        renderApp();
+    </script>
+</body>
+</html>
