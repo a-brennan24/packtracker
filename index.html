@@ -98,7 +98,7 @@
             <!-- Global TCG Set Search Bar -->
             <div class="relative">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">4. Search Expansion Set</label>
-                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" placeholder="Type set name (e.g. Shrouded Fable, Infinite Forbidden, Bloomburrow)..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
+                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" placeholder="Type set name (e.g. Mega Evolution, Shrouded Fable, Infinite Forbidden)..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
                 <div id="setSearchResults" class="search-results-box hidden"></div>
             </div>
 
@@ -131,27 +131,27 @@
         let selectedStoreKey = null;
         let selectedSetName = "";
 
-        // Core Live Database Index Object loaded asynchronously on selection changes
+        // UPDATED DATABASE: Mega Evolution sets pinned right to the top
         let cachedSetsDatabase = {
             "pokemon-en": [
-                "Scarlet & Violet: Prismatic Evolutions", "Scarlet & Violet: Surging Sparks", "Scarlet & Violet: Shrouded Fable", "Scarlet & Violet: Twilight Masquerade", "Scarlet & Violet: Temporal Forces", "Scarlet & Violet: Paldean Fates", "Scarlet & Violet: Paradox Rift", "Scarlet & Violet: Obsidian Flames", "Scarlet & Violet: Paldea Evolved", "Scarlet & Violet Base Set", "Scarlet & Violet: 151 Special Collection", "Crown Zenith", "Silver Tempest", "Lost Origin", "Astral Radiance", "Brilliant Stars", "Evolving Skies", "Chilling Reign", "Battle Styles", "Vivid Voltage", "Darkness Ablaze", "Rebel Clash", "Sword & Shield Base Set", "Hidden Fates", "Unified Minds", "Unbroken Bonds", "Team Up", "Lost Thunder", "Celestial Storm", "Forbidden Light", "Ultra Prism", "Crimson Invasion", "Burning Shadows", "Guardians Rising", "Sun & Moon Base Set", "Evolutions", "Steam Siege", "Fates Collide", "Generations", "BREAKpoint", "BREAKthrough", "Ancient Origins", "Roaring Skies", "Primal Clash", "Phantom Forces", "Furious Fists", "Flashfire", "XY Base Set", "Plasma Blast", "Plasma Storm", "Boundaries Crossed", "Black & White Base Set"
+                "Pokémon: Mega Evolution Initial Strike", "Pokémon: Legends Z-A Mega Chronicles", "Scarlet & Violet: Prismatic Evolutions", "Scarlet & Violet: Surging Sparks", "Scarlet & Violet: Shrouded Fable", "Scarlet & Violet: Twilight Masquerade", "Scarlet & Violet: Temporal Forces", "Scarlet & Violet: Paldean Fates", "Scarlet & Violet: 151 Special Collection", "XY: Roaring Skies (Mega Rayquaza)", "XY: Ancient Origins (Mega Tyranitar)", "XY: Phantom Forces (Mega Gengar)", "XY: Flashfire (Mega Charizard)"
             ],
             "pokemon-jp": [
-                "Terastal Festival (SV8a)", "Supercharged Breaker (SV8)", "Paradise Dragona (SV7a)", "stellar Miracle (SV7)", "Night Wanderer (SV6a)", "Mask of Change (SV6)", "Crimson Haze (SV5a)", "Cyber Judge (SV5M)", "Wild Force (SV5K)", "Shiny Treasure ex (SV4a)", "Ancient Roar (SV4K)", "Future Flash (SV4M)", "Raging Surf (SV3a)", "Ruler of the Black Flame (SV3)", "Pokémon Card 151 (SV2a)", "Clay Burst (SV2D)", "Snow Hazard (SV2P)", "Triplet Beat (SV1a)", "Scarlet ex (SV1S)", "Violet ex (SV1V)", "VSTAR Universe (S12a)", "Paradigm Trigger (S12)", "Incandescent Arcana (S11a)", "Lost Abyss (S11)", "Pokémon GO (S10b)", "Dark Phantasma (S10a)", "Space Juggler (S10P)", "Time Gazer (S10D)", "Battle Region (S9a)", "Star Birth (S9)", "VMAX Climax (S8b)", "25th Anniversary Collection", "Fusion Arts (S8)", "Eevee Heroes (S6a)", "Silver Lance (S6H)", "Jet-Black Spirit (S6K)", "Matchless Fighters (S5a)", "Shiny Star V (S4a)"
+                "Mega Awakening (SV9)", "Lumiose Legends (SV9a)", "Terastal Festival (SV8a)", "Supercharged Breaker (SV8)", "Paradise Dragona (SV7a)", "Stellar Miracle (SV7)", "Night Wanderer (SV6a)", "Pokémon Card 151 (SV2a)"
             ],
             "lorcana": [
                 "Azurite Sea (Chapter 6)", "Shimmering Skies (Chapter 5)", "Ursula's Return (Chapter 4)", "Into the Inklands (Chapter 3)", "Rise of the Floodborn (Chapter 2)", "The First Chapter (Chapter 1)"
             ],
             "yugioh": [
-                "The Infinite Forbidden", "Legacy of Destruction", "Phantom Nightmare", "Age of Overlord", "Nexus of Duelist", "Cyberstorm Access", "Photon Hypernova", "Darkwing Blast", "Power of the Elements", "Dimension Force", "Battle of Chaos", "Burst of Destiny", "Dawn of Majesty", "Lightning Overdrive", "Blazing Vortex", "Phantom Rage", "Rise of the Duelist", "Eternity Code", "Ignition Assault", "Chaos Impact", "Rising Rampage", "Dark Neostorm", "Savage Strike", "Soul Fusion", "Cybernetic Horizon", "Flames of Destruction", "Extreme Force", "Circuit Break", "Code of the Duelist", "Maximum Crisis", "Raging Tempest", "Invasion: Vengeance", "The Dark Illusion", "Shining Victories", "Breakers of Shadow", "Dimension of Chaos", "Clash of Rebellions", "Crossed Souls", "Secrets of Eternity", "The New Challengers", "Duelist Alliance", "Prismatic Art Collection", "Rarity Collection: Quarter Century Edition", "Magnificent Mavens", "Ghosts From the Past", "Duel Power"
+                "The Infinite Forbidden", "Legacy of Destruction", "Phantom Nightmare", "Age of Overlord", "Nexus of Duelist", "Prismatic Art Collection", "Rarity Collection: Quarter Century Edition"
             ],
             "mtg": [
-                "Foundations (FDN)", "Duskmourn: House of Horror (DSK)", "Bloomburrow (BLB)", "Modern Horizons 3 (MH3)", "Outlaws of Thunder Junction (OTJ)", "Murders at Karlov Manor (MKM)", "The Lost Caverns of Ixalan (LCI)", "Wilds of Eldraine (WOE)", "Commander Masters (CMM)", "The Lord of the Rings: Tales of Middle-earth (LTR)", "March of the Machine (MOM)", "Phyrexia: All Will Be One (ONE)", "The Brothers' War (BRO)", "Dominaria United (DMU)", "Commander Legends: Battle for Baldur's Gate (CLB)", "Streets of New Capenna (SNC)", "Kamigawa: Neon Dynasty (NEO)", "Innistrad: Crimson Vow (VOW)", "Innistrad: Midnight Hunt (MID)", "Modern Horizons 2 (MH2)", "Strixhaven: School of Mages (STX)", "Kaldheim (KHM)", "Commander Legends (CMR)", "Zendikar Rising (ZNR)", "Core Set 2021 (M21)", "Ikoria: Lair of Behemoths (IKO)", "Theros Beyond Death (THB)", "Throne of Eldraine (ELD)", "Modern Horizons (MH1)", "War of the Spark (WAR)", "Ravnica Allegiance (RNA)", "Guilds of Ravnica (GRN)", "Core Set 2019 (M19)", "Dominaria (DOM)", "Unstable (UST)", "Ixalan (XLN)", "Hour of Devastation (HOU)", "Amonkhet (AKH)", "Aether Revolt (AER)", "Kaladesh (KLD)", "Eldritch Moon (EMN)", "Shadows over Innistrad (SOI)", "Oath of the Gatewatch (OGW)", "Battle for Zendikar (BFZ)", "Khans of Tarkir (KTK)", "Return to Ravnica (RTR)", "Innistrad (ISD)", "Zendikar (ZEN)"
+                "Foundations (FDN)", "Duskmourn: House of Horror (DSK)", "Bloomburrow (BLB)", "Modern Horizons 3 (MH3)", "Outlaws of Thunder Junction (OTJ)", "Murders at Karlov Manor (MKM)"
             ]
         };
 
         let reports = JSON.parse(localStorage.getItem('pt_reports')) || [
-            { id: 1, storeKey: "tesco-bandon", set: "Pokémon: Temporal Forces", status: "Full", note: "3 boxes left on the bottom aisle shelf.", flags: 0, time: "Just now" }
+            { id: 1, storeKey: "tesco-bandon", set: "Pokémon: Mega Evolution Initial Strike", status: "Full", note: "Mega packs loaded on the front hanger grid!", flags: 0, time: "Just now" }
         ];
 
         let currentZoom = 1.0;
@@ -221,17 +221,15 @@
                     renderApp();
                     inspectStore(key);
                 };
-                addRow.appendChild(addRow);
+                resultsBox.appendChild(addRow);
             }
         }
 
         function onGameSystemChange() {
-            // Wipes the search box if the user alters the database tracking system dropdown
             document.getElementById('setSearchInput').value = "";
             selectedSetName = "";
         }
 
-        // Dynamic Filtering Engine across global game collections
         function filterGlobalSetSearch() {
             const selectedSystem = document.getElementById('gameSelect').value;
             const query = document.getElementById('setSearchInput').value.toLowerCase();
@@ -241,11 +239,10 @@
             if(!query) { resultsBox.classList.add('hidden'); return; }
             resultsBox.classList.remove('hidden');
 
-            // Fetches the array from our localized game key database map
             const targetSetArray = cachedSetsDatabase[selectedSystem] || [];
             const filtered = targetSetArray.filter(setName => setName.toLowerCase().includes(query));
 
-            filtered.slice(0, 15).forEach(setName => { // Limit layout index to 15 display items for performance safety
+            filtered.slice(0, 15).forEach(setName => {
                 const row = document.createElement('div');
                 row.className = "search-item";
                 row.innerText = setName;
@@ -257,7 +254,6 @@
                 resultsBox.appendChild(row);
             });
 
-            // Fallback: If a user searches for an obscure set, allow them to input it manually
             if(filtered.length === 0) {
                 const manualRow = document.createElement('div');
                 manualRow.className = "search-item text-slate-500 italic";
@@ -361,7 +357,6 @@
         }
 
         function submitReport() {
-            const nameInput = document.getElementById('storeSearchInput').value;
             const setInput = document.getElementById('setSearchInput').value;
             const status = document.getElementById('statusSelect').value;
             const note = document.getElementById('reportNote').value;
