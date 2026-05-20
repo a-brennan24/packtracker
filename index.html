@@ -31,8 +31,8 @@
         </div>
     </header>
 
-    <!-- NEW FEATURE: Native Light Guide Manual Pop-up Modal Container -->
-    <div id="manualModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[100] flex items-center justify-center p-4 hidden opacity-0 modal-overlay">
+    <!-- FIXED LAYER DETAILS: Native Light Guide Manual Pop-up Modal Container -->
+    <div id="manualModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 modal-overlay">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-teal-100 max-h-[85vh] overflow-y-auto space-y-4">
             <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                 <h3 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">📖 PackTracker Manual</h3>
@@ -112,6 +112,7 @@
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Tracked Store Location</label>
                 <input type="text" id="storeSearchInput" list="storeDataList" placeholder="Type or click to choose saved shop location..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <div id="storeSearchResults" class="search-results-box hidden"></div>
                 <datalist id="storeDataList"></datalist>
             </div>
 
@@ -196,12 +197,11 @@
             ]
         };
 
-        // Preloaded baseline log entry containing a functional raw epoch millisecond stamp coordinates calculation
         let reports = JSON.parse(localStorage.getItem('tcg_reports')) || [
             { id: 1, storeKey: "smyths-cork", set: "Pokémon: Mega Evolution Perfect Order", status: "Low", note: "Hanger racks filled behind customer service.", flags: 0, timestamp: Date.now(), time: "Just now" }
         ];
 
-        // NEW FEATURE: Toggles manual modal window layout states smoothly
+        // NEW FIX: Correctly maps active display states of the popup frame window elements
         function toggleManualModal(show) {
             const modal = document.getElementById('manualModal');
             if (show) {
@@ -213,12 +213,10 @@
             }
         }
 
-        // NEW FEATURE: 48-Hour Auto-Expiry engine logic filter. Runs instantly upon page request execution
         function filterExpiredReports() {
             const fortyEightHoursInMs = 48 * 60 * 60 * 1000;
             const now = Date.now();
             
-            // Filters out and preserves only reports written within the 48-hour time loop horizon
             const unexpiredReports = reports.filter(report => {
                 const reportTime = report.timestamp || Date.now();
                 return (now - reportTime) < fortyEightHoursInMs;
@@ -231,7 +229,7 @@
         }
 
         function runGlobalSearch() {
-            filterExpiredReports(); // Sanitize dataset rules before running lookup queries
+            filterExpiredReports(); 
             const query = document.getElementById('globalSearchInput').value.toLowerCase().trim();
             const container = document.getElementById('searchResultsContainer');
             container.innerHTML = '';
@@ -347,7 +345,7 @@
         }
 
         function renderApp() {
-            filterExpiredReports(); // Run cleanup sequence prior to compiling live timeline display vectors
+            filterExpiredReports(); 
             const feed = document.getElementById('feedContainer');
             if(!feed) return;
             feed.innerHTML = '';
@@ -409,7 +407,7 @@
                 status: status,
                 note: note,
                 flags: 0,
-                timestamp: Date.now(), // Logs the exact real-world timestamp loop calculation for 48h filtering metrics
+                timestamp: Date.now(), 
                 time: timeString
             };
 
