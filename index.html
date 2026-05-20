@@ -42,7 +42,7 @@
             <div id="searchResultsContainer" class="space-y-2 pt-1"></div>
         </div>
 
-        <!-- NEW SECTION 2: DEDICATED STORE REGISTRATION BOX -->
+        <!-- SECTION 2: DEDICATED STORE REGISTRATION BOX -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">2. Add a New Retail Store</h2>
             <p class="text-xs text-slate-500">Store missing from the dropdown tracker below? Add its details here instantly.</p>
@@ -73,6 +73,7 @@
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Tracked Store Location</label>
                 <input type="text" id="storeSearchInput" list="storeDataList" placeholder="Type or click to choose saved shop location..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <div id="storeSearchResults" class="search-results-box hidden"></div>
                 <datalist id="storeDataList"></datalist>
             </div>
 
@@ -126,9 +127,24 @@
     </main>
 
     <script>
-        let localStores = JSON.parse(localStorage.getItem('pt_stores')) || [
+        // Master hardcoded source list
+        const masterDefaultStores = [
             { key: "smyths-cork", name: "Smyths Toys Kinsale Rd", county: "Cork" },
+            { key: "tesco-midleton", name: "Tesco Superstore Midleton", county: "Cork" },
+            { key: "geek-retreat-dublin", name: "Geek Retreat", county: "Dublin" }
         ];
+
+        // Fetch from storage or fall back to defaults
+        let localStores = JSON.parse(localStorage.getItem('pt_stores')) || masterDefaultStores;
+
+        // SELF-HEALING PATCH: Safely cycles through old cache rows and hooks missing counties without wiping records
+        localStores.forEach(store => {
+            if (!store.county || store.county === "undefined") {
+                const match = masterDefaultStores.find(m => m.key === store.key);
+                store.county = match ? match.county : "Cork"; // Fallback to Cork if all else fails
+            }
+        });
+        localStorage.setItem('pt_stores', JSON.stringify(localStores));
 
         let cachedSetsDatabase = {
             "pokemon-en": ["Pokémon: Mega Evolution Perfect Order", "Pokémon: Mega Evolution Initial Strike", "Pokémon: Legends Z-A Mega Chronicles", "Scarlet & Violet: Prismatic Evolutions", "Scarlet & Violet: Surging Sparks", "Scarlet & Violet: Shrouded Fable", "Scarlet & Violet: 151 Collection"],
@@ -188,7 +204,6 @@
             });
         }
 
-        // NEW ISOLATED ACTION: Explicitly adds a store node cleanly to the structural data array index
         function createNewStoreNatively() {
             const storeName = document.getElementById('newStoreNameInput').value.trim();
             const countySelected = document.getElementById('newStoreCountySelect').value;
@@ -198,7 +213,6 @@
                 return;
             }
 
-            // Guard rails verify the store text block hasn't been saved already
             let exists = localStores.find(s => s.name.toLowerCase() === storeName.toLowerCase());
             if(exists) {
                 alert(`Platform Warning: A retail store named "${storeName}" is already registered in the list tracker dashboard.`);
@@ -211,7 +225,6 @@
             localStores.push(storeObject);
             localStorage.setItem('pt_stores', JSON.stringify(localStores));
             
-            // Clear input box and refresh datalist indicators instantly
             document.getElementById('newStoreNameInput').value = '';
             alert(`Success: "${storeName} (${countySelected})" has been registered. You can now select it in Section 3!`);
             
@@ -305,7 +318,6 @@
                 return;
             }
 
-            // Verifies the user selected an actual store location entry that was generated inside block 2
             let matchedStore = localStores.find(s => s.name.toLowerCase() === storeInputName.toLowerCase());
             
             if(!matchedStore) {
