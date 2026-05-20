@@ -4,97 +4,63 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PackTracker Ireland</title>
-    <!-- Tailwind CSS for mobile layout styling -->
+    <!-- Tailwind CSS for modern mobile layout styling -->
     <script src="https://tailwindcss.com"></script>
     <style>
         body { background-color: #f0fdfa; font-family: system-ui, -apple-system, sans-serif; }
         .breeze-bg { background-color: #f0fdfa; }
-        
-        /* Zoomable native radar viewport system constraints */
-        .map-viewport { position: relative; width: 100%; height: 380px; background: #e0f2fe; overflow: hidden; cursor: grab; }
-        .map-viewport:active { cursor: grabbing; }
-        .map-surface { position: absolute; width: 1000px; height: 1000px; transform-origin: 0 0; background: #e0f2fe; transition: transform 0.05s linear; }
-        
-        /* Interactive marker coordinate configurations */
-        .map-pin { position: absolute; width: 18px; height: 18px; border-radius: 50%; border: 2px solid white; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transform: translate(-50%, -50%); z-index: 10; }
-        .pin-label { position: absolute; background: rgba(15, 23, 42, 0.9); color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; border: 1px solid #334155; white-space: nowrap; pointer-events: none; transform: translate(-35%, -24px); }
-        
-        /* Inventory color states matching logic rules */
-        .color-Full { background-color: #22c55e; }
-        .color-Low { background-color: #eab308; }
-        .color-Out { background-color: #ef4444; }
-        .color-Unknown { background-color: #64748b; }
-
-        /* Dropdown search lookup filter boxes overlay states */
-        .search-results-box { position: absolute; width: 100%; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
-        .search-item { padding: 10px 12px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f1f5f9; }
+        .search-results-box { position: absolute; width: 100%; max-height: 220px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .search-item { padding: 12px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f1f5f9; }
         .search-item:hover { background: #f0fdfa; color: #0d9488; font-weight: 500; }
-        
-        .feed-card { background: white; padding: 14px; border-radius: 12px; border: 1px solid #f1f5f9; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; border: 1px solid; }
+        .feed-card { background: white; padding: 16px; border-radius: 12px; border: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
+        .badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; border: 1px solid; white-space: nowrap; }
         .badge-Full { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
         .badge-Low { background: #fef9c3; color: #854d0e; border-color: #fef08a; }
         .badge-Out { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
         .badge-Unknown { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
-        .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
     </style>
 </head>
 <body class="breeze-bg text-slate-800 pb-24">
 
-    <!-- App Header Navbar Layer -->
+    <!-- App Header Navbar -->
     <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
-            <span class="text-xs bg-teal-800 px-2.5 py-1 rounded-full font-medium">All-Features Active</span>
+            <span class="text-xs bg-teal-800 px-2.5 py-1 rounded-full font-medium">Text Radar Engine</span>
         </div>
     </header>
 
-    <main class="max-w-md mx-auto p-4 space-y-4">
+    <main class="max-w-md mx-auto p-4 space-y-5">
         
-        <!-- Interactive Zoomable Map Canvas -->
-        <div class="bg-white rounded-xl shadow-sm border border-teal-100 overflow-hidden">
-            <div class="p-3 bg-teal-50 border-b border-teal-100 flex justify-between items-center">
-                <h2 class="font-semibold text-teal-900 flex items-center gap-1">📍 National Navigation Radar Grid</h2>
-                <div class="flex gap-1">
-                    <button onclick="adjustZoom(0.2)" class="bg-white border border-slate-200 text-slate-700 w-7 h-7 rounded font-bold flex items-center justify-center shadow-sm active:scale-90">+</button>
-                    <button onclick="adjustZoom(-0.2)" class="bg-white border border-slate-200 text-slate-700 w-7 h-7 rounded font-bold flex items-center justify-center shadow-sm active:scale-90">-</button>
-                </div>
+        <!-- SECTION 1: MASTER SEARCH ENGINE (STORES OR SETS) -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-3">
+            <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">🔍 Global Search Engine</h2>
+            <p class="text-xs text-slate-500">Instantly look up a store name, town, or TCG set to check live shelf statuses.</p>
+            
+            <div class="relative">
+                <input type="text" id="globalSearchInput" oninput="runGlobalSearch()" placeholder="Type a store or set name (e.g. Smyths, Mega, 151)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
             </div>
             
-            <div class="map-viewport" id="mapViewport">
-                <div class="map-surface" id="mapSurface">
-                    <!-- Native Geographic Vector Mapping Layers (All-Ireland Outline and Highway Paths) -->
-                    <svg width="1000" height="1000" style="position: absolute; top:0; left:0; pointer-events: none;">
-                        <path d="M 150 200 Q 300 100, 600 150 T 850 300 T 700 850 T 300 900 Z" fill="#f0f9ff" stroke="#bae6fd" stroke-width="4" />
-                        <path d="M 450 150 Q 500 500, 520 850" fill="none" stroke="#94a3b8" stroke-width="5" stroke-dasharray="6,6" />
-                        <path d="M 200 600 L 800 520" fill="none" stroke="#cbd5e1" stroke-width="4" />
-                        <path d="M 500 480 Q 550 500, 520 520" fill="none" stroke="#38bdf8" stroke-width="14" />
-                    </svg>
-                    <div id="pinsLayer"></div>
-                </div>
-            </div>
-            
-            <div class="bg-slate-900 text-white p-4 text-sm" id="inspectorPanel">
-                <span class="text-teal-400 font-bold">ℹ️ Navigation Mode:</span> Click + / - to scale view. Drag across fields to reposition framework. Tap pins to read stocks.
-            </div>
+            <!-- Dynamic search outputs container grid -->
+            <div id="searchResultsContainer" class="space-y-2 pt-1"></div>
         </div>
 
-        <!-- Submission Input Form -->
-        <div class="bg-white p-4 rounded-xl shadow-sm border border-teal-100 space-y-4">
-            <h2 class="font-bold text-lg text-teal-900 flex items-center gap-2">📝 Log a Shelf Report</h2>
+        <!-- SECTION 2: LOG LOGS & BROADCAST NEW SHELF FILE UPDATES -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
+            <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">📝 Log a Shelf Report</h2>
             
-            <!-- Store Autocomplete Selector Bar -->
+            <!-- Store Selector Bar -->
             <div class="relative">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">1. Search or Add Store</label>
-                <input type="text" id="storeSearchInput" oninput="filterStoreSearch()" onblur="hideStoreResultsDelayed()" placeholder="Type to filter list or type a name to create new..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">1. Select Store Location</label>
+                <input type="text" id="storeSearchInput" oninput="filterStoreFormSearch()" onblur="hideStoreResultsDelayed()" placeholder="Type store name or town..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
                 <div id="storeSearchResults" class="search-results-box hidden"></div>
             </div>
 
-            <!-- TCG System Select Dropdowns -->
+            <!-- TCG Dropdowns -->
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">2. Select Game System</label>
-                    <select id="gameSelect" onchange="onGameSystemChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">2. Game System</label>
+                    <select id="gameSelect" onchange="onGameSystemChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
                         <option value="pokemon-en">Pokémon (English)</option>
                         <option value="pokemon-jp">Pokémon (Japanese)</option>
                         <option value="lorcana">Disney Lorcana</option>
@@ -104,8 +70,8 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">3. Status</label>
-                    <select id="statusSelect" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 font-bold focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">3. Stock Status</label>
+                    <select id="statusSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
                         <option value="Full" class="text-green-600">🟢 Full Stock</option>
                         <option value="Low" class="text-yellow-600">🟡 Low Stock</option>
                         <option value="Out" class="text-red-600">🔴 Out of Stock</option>
@@ -113,91 +79,99 @@
                 </div>
             </div>
 
-            <!-- Expansion List Search Filter Bar -->
+            <!-- TCG Set Search Filter Bar -->
             <div class="relative">
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">4. Search Expansion Set</label>
-                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" onblur="hideSetResultsDelayed()" placeholder="Type set title (e.g. Mega Evolution, Shrouded Fable)..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">4. Select TCG Expansion Set</label>
+                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" onblur="hideSetResultsDelayed()" placeholder="Search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
                 <div id="setSearchResults" class="search-results-box hidden"></div>
             </div>
 
-            <!-- Custom Note Block input field -->
+            <!-- Custom text comment notes box -->
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">5. Custom Note (Optional)</label>
-                <input type="text" id="reportNote" placeholder="e.g. Limit 2 boxes per person, items located inside checkout lane..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <input type="text" id="reportNote" placeholder="e.g. Kept behind customer desk, limit 2 packs max..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
             </div>
 
-            <button onclick="submitReport()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition-all shadow-md shadow-teal-100 active:scale-[0.98]">
+            <button onclick="submitReport()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-teal-100 active:scale-[0.98]">
                 Broadcast Live Update
             </button>
         </div>
 
-        <!-- Activity Feed List Dashboard -->
-        <div class="space-y-2">
-            <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider px-1">Live Feed Activity Log</h3>
+        <!-- SECTION 3: LIVE RECENT FEED UPDATES TRACK TIMELINE TIMESTAMPS -->
+        <div class="space-y-2.5">
+            <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider px-1">📋 Live Feed Updates</h3>
             <div id="feedContainer" class="space-y-2"></div>
         </div>
 
     </main>
 
     <script>
-        // Preset default baseline location keys listing out target coordinate pins
+        // Master store location index array datalog keys
         let localStores = JSON.parse(localStorage.getItem('pt_stores')) || [
-            { key: "smyths-cork", name: "Smyths Toys Kinsale Rd", x: 520, y: 530 }
+            { key: "smyths-cork", name: "Smyths Toys Kinsale Rd (Cork)" },
+            { key: "tesco-midleton", name: "Tesco Superstore Midleton" },
+            { key: "geek-retreat-dublin", name: "Geek Retreat (Dublin)" }
         ];
 
         let selectedStoreKey = null;
         let selectedSetName = "";
 
-        // All TCG Expansion index arrays mapped directly across selectable drop paths
         let cachedSetsDatabase = {
-            "pokemon-en": [
-                "Pokémon: Mega Evolution Perfect Order", "Pokémon: Mega Evolution Initial Strike", "Pokémon: Legends Z-A Mega Chronicles", "Scarlet & Violet: Prismatic Evolutions", "Scarlet & Violet: Surging Sparks", "Scarlet & Violet: Shrouded Fable", "Scarlet & Violet: Twilight Masquerade", "Scarlet & Violet: Temporal Forces", "Scarlet & Violet: 151 Special Collection"
-            ],
-            "pokemon-jp": [
-                "Mega Awakening (SV9)", "Lumiose Legends (SV9a)", "Terastal Festival (SV8a)", "Supercharged Breaker (SV8)", "Pokémon Card 151 (SV2a)"
-            ],
-            "lorcana": ["Azurite Sea (Chapter 6)", "Shimmering Skies (Chapter 5)", "Ursula's Return (Chapter 4)", "Into the Inklands (Chapter 3)"],
-            "yugioh": ["The Infinite Forbidden", "Legacy of Destruction", "Phantom Nightmare", "Age of Overlord"],
-            "mtg": ["Foundations (FDN)", "Duskmourn: House of Horror (DSK)", "Bloomburrow (BLB)", "Modern Horizons 3 (MH3)"]
+            "pokemon-en": ["Pokémon: Mega Evolution Perfect Order", "Pokémon: Mega Evolution Initial Strike", "Pokémon: Legends Z-A Mega Chronicles", "Scarlet & Violet: Prismatic Evolutions", "Scarlet & Violet: Surging Sparks", "Scarlet & Violet: Shrouded Fable", "Scarlet & Violet: 151 Collection"],
+            "pokemon-jp": ["Mega Awakening (SV9)", "Lumiose Legends (SV9a)", "Terastal Festival (SV8a)", "Pokémon Card 151 (SV2a)"],
+            "lorcana": ["Azurite Sea (Chapter 6)", "Shimmering Skies (Chapter 5)", "Into the Inklands (Chapter 3)"],
+            "yugioh": ["The Infinite Forbidden", "Legacy of Destruction", "Phantom Nightmare"],
+            "mtg": ["Foundations (FDN)", "Duskmourn: House of Horror (DSK)", "Bloomburrow (BLB)"]
         };
 
         let reports = JSON.parse(localStorage.getItem('tcg_reports')) || [
-            { id: 1, storeKey: "smyths-cork", set: "Pokémon: Mega Evolution Perfect Order", status: "Low", note: "Located inside counter hanger tracks.", flags: 0, time: "Just now" }
+            { id: 1, storeKey: "smyths-cork", set: "Pokémon: Mega Evolution Perfect Order", status: "Low", note: "Hanger racks filled behind customer service.", flags: 0, time: "Just now" }
         ];
 
-        // Zoom/Drag parameters handling viewport transformations natively
-        let currentZoom = 1.0;
-        let posX = -120, posY = -120;
-        let isDragging = false;
-        let startX, startY;
+        // SECTION 1 ENGINE: Instant search lookup filter logic maps both parameters simultaneously
+        function runGlobalSearch() {
+            const query = document.getElementById('globalSearchInput').value.toLowerCase();
+            const container = document.getElementById('searchResultsContainer');
+            container.innerHTML = '';
 
-        const viewport = document.getElementById('mapViewport');
-        const surface = document.getElementById('mapSurface');
+            if(!query) return;
 
-        viewport.addEventListener('mousedown', (e) => {
-            if(e.target.classList.contains('map-pin')) return;
-            isDragging = true;
-            startX = e.clientX - posX;
-            startY = e.clientY - posY;
-        });
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            posX = e.clientX - startX;
-            posY = e.clientY - startY;
-            updateSurfaceTransform();
-        });
-        window.addEventListener('mouseup', () => isDragging = false);
+            // Gather any reports matching the store text or set name string queries
+            const filteredReports = reports.filter(r => {
+                const storeObj = localStores.find(s => s.key === r.storeKey);
+                const storeName = storeObj ? storeObj.name.toLowerCase() : '';
+                const setName = r.set.toLowerCase();
+                return storeName.includes(query) || setName.includes(query);
+            });
 
-        function adjustZoom(amount) {
-            currentZoom = Math.min(Math.max(currentZoom + amount, 0.6), 2.2);
-            updateSurfaceTransform();
+            if(filteredReports.length === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-400 italic p-2 bg-white rounded-xl border border-slate-100">No active stock logs matched that query. Try logging an update below!</div>`;
+                return;
+            }
+
+            filteredReports.forEach(report => {
+                const storeObj = localStores.find(s => s.key === report.storeKey);
+                const colorMap = { 'Full': 'badge-Full', 'Low': 'badge-Low', 'Out': 'badge-Out', 'Unknown': 'badge-Unknown' };
+                const dotMap = { 'Full': '🟢', 'Low': '🟡', 'Out': '🔴', 'Unknown': '⚪' };
+
+                const card = document.createElement('div');
+                card.className = "feed-card border-teal-200 bg-teal-50/30";
+                card.innerHTML = `
+                    <div style="flex:1; padding-right:12px;">
+                        <strong class="text-teal-950 text-sm">${storeObj ? storeObj.name : 'Store Node'}</strong>
+                        <div class="text-xs text-teal-700 font-medium mt-0.5">${report.set}</div>
+                        ${report.note ? `<div class="text-[11px] text-slate-600 bg-white border p-1.5 rounded mt-1.5 font-mono">Note: ${report.note}</div>` : ''}
+                    </div>
+                    <div class="text-right flex flex-col items-end">
+                        <span class="badge ${colorMap[report.status]}">${dotMap[report.status]} ${report.status}</span>
+                        <div class="time-text mt-2">Logged: ${report.time}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
         }
-        function updateSurfaceTransform() {
-            surface.style.transform = `translate(${posX}px, ${posY}px) scale(${currentZoom})`;
-        }
-        updateSurfaceTransform();
 
-        function filterStoreSearch() {
+        function filterStoreFormSearch() {
             const query = document.getElementById('storeSearchInput').value.toLowerCase();
             const resultsBox = document.getElementById('storeSearchResults');
             resultsBox.innerHTML = '';
@@ -210,7 +184,7 @@
                 const row = document.createElement('div');
                 row.className = "search-item";
                 row.innerText = store.name;
-                row.onmousedown = () => { // PATCH: Using onmousedown captures the layout selection before input focus breaks
+                row.onmousedown = () => {
                     document.getElementById('storeSearchInput').value = store.name;
                     selectedStoreKey = store.key;
                     resultsBox.classList.add('hidden');
@@ -218,6 +192,7 @@
                 resultsBox.appendChild(row);
             });
 
+            // SECTION 2 DYNAMIC FEATURE: Add new custom store immediately on text submission input
             if(filtered.length === 0) {
                 const addRow = document.createElement('div');
                 addRow.className = "search-item text-teal-600 font-bold";
@@ -225,25 +200,20 @@
                 addRow.onmousedown = () => {
                     const name = document.getElementById('storeSearchInput').value;
                     const key = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                    const newStore = { key: key, name: name };
                     
-                    const newStore = { key: key, name: name, x: 500 + (Math.random()*80 - 40), y: 500 + (Math.random()*80 - 40) };
                     localStores.push(newStore);
                     localStorage.setItem('pt_stores', JSON.stringify(localStores));
-                    
                     selectedStoreKey = key;
                     resultsBox.classList.add('hidden');
                     renderApp();
-                    inspectStore(key);
                 };
                 resultsBox.appendChild(addRow);
             }
         }
 
-        // PATCH: Delayed close ensures data registers on slow phone tap inputs before hiding
         function hideStoreResultsDelayed() {
-            setTimeout(() => {
-                document.getElementById('storeSearchResults').classList.add('hidden');
-            }, 200);
+            setTimeout(() => { document.getElementById('storeSearchResults').classList.add('hidden'); }, 200);
         }
 
         function onGameSystemChange() {
@@ -267,7 +237,7 @@
                 const row = document.createElement('div');
                 row.className = "search-item";
                 row.innerText = setName;
-                row.onmousedown = () => { // PATCH: Swapped to onmousedown execution track
+                row.onmousedown = () => {
                     document.getElementById('setSearchInput').value = setName;
                     selectedSetName = setName;
                     resultsBox.classList.add('hidden');
@@ -287,64 +257,31 @@
             }
         }
 
-        // PATCH: Smooth timeout for the expansion selector container box
         function hideSetResultsDelayed() {
-            setTimeout(() => {
-                document.getElementById('setSearchResults').classList.add('hidden');
-            }, 200);
+            setTimeout(() => { document.getElementById('setSearchResults').classList.add('hidden'); }, 200);
         }
 
-        function inspectStore(key) {
-            const store = localStores.find(s => s.key === key);
-            const panel = document.getElementById('inspectorPanel');
-            const match = reports.filter(r => r.storeKey === key).pop();
-            
-            if (match) {
-                const dots = { 'Full': '🟢', 'Low': '🟡', 'Out': '🔴', 'Unknown': '⚪' };
-                panel.innerHTML = `
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <strong class="text-teal-400 text-base">${store.name}</strong>
-                            <p class="text-xs text-slate-400 mt-1">📦 Active Tracker: ${match.set}</p>
-                        </div>
-                        <div class="text-right">
-                            <span class="font-bold text-sm">${dots[match.status]} ${match.status}</span>
-                            <button onclick="flagReport(${match.id}, '${key}')" class="block bg-red-900/40 text-red-300 border border-red-800 text-[10px] px-2 py-0.5 rounded mt-2 font-bold hover:bg-red-800 hover:text-white transition-colors">⚠️ Flag False Data (${match.flags || 0}/5)</button>
-                        </div>
-                    </div>
-                    ${match.note ? `<div class="mt-2.5 bg-slate-950 p-2 rounded text-xs border border-slate-800 text-slate-300 font-mono">📝 Note: ${match.note}</div>` : ''}
-                `;
-            } else {
-                panel.innerHTML = `<strong class="text-slate-200 text-base">${store.name}</strong><br><span class="text-slate-500 text-xs">⚠️ No active stock reports logged for this position yet.</span>`;
-            }
-        }
-
-        function flagReport(id, storeKey) {
+        // FEATURE: Flag inaccurate self-policing engine tracking metrics
+        function flagReport(id) {
             const report = reports.find(r => r.id === id);
             if(report) {
                 report.flags = (report.flags || 0) + 1;
                 if(report.flags >= 5) {
                     report.status = "Unknown";
-                    report.note = "System Reset: Cleared following community flagging threshold validation loops.";
+                    report.note = "System Reset: Previous report cleared following community flagging threshold validation loops.";
                 }
                 localStorage.setItem('tcg_reports', JSON.stringify(reports));
                 renderApp();
-                inspectStore(storeKey);
+                if(document.getElementById('globalSearchInput').value) runGlobalSearch();
             }
         }
 
         function renderApp() {
-            const pinsLayer = document.getElementById('pinsLayer');
-            if(pinsLayer) pinsLayer.innerHTML = '';
-            
             const feed = document.getElementById('feedContainer');
-            if(feed) feed.innerHTML = '';
-
-            const activeStoreStatus = {};
+            if(!feed) return;
+            feed.innerHTML = '';
 
             reports.forEach(report => {
-                activeStoreStatus[report.storeKey] = report;
-
                 const colorMap = { 'Full': 'badge-Full', 'Low': 'badge-Low', 'Out': 'badge-Out', 'Unknown': 'badge-Unknown' };
                 const dotMap = { 'Full': '🟢', 'Low': '🟡', 'Out': '🔴', 'Unknown': '⚪' };
                 const storeObj = localStores.find(s => s.key === report.storeKey);
@@ -353,34 +290,17 @@
                 card.className = "feed-card";
                 card.innerHTML = `
                     <div style="flex:1; padding-right:12px;">
-                        <strong class="text-slate-900 text-sm">${storeObj ? storeObj.name : 'Added Store Location'}</strong>
+                        <strong class="text-slate-900 text-sm">${storeObj ? storeObj.name : 'Added Location Node'}</strong>
                         <div class="text-xs text-slate-500 font-medium mt-0.5">${report.set}</div>
                         ${report.note ? `<div class="text-[11px] text-slate-600 bg-slate-50 border p-1.5 rounded mt-1.5 font-mono">${report.note}</div>` : ''}
                     </div>
                     <div class="text-right flex flex-col items-end justify-between">
                         <span class="badge ${colorMap[report.status]}">${dotMap[report.status]} ${report.status}</span>
+                        <button onclick="flagReport(${report.id})" class="text-[10px] text-red-500 border border-red-200 bg-red-50 font-bold px-1.5 py-0.5 rounded mt-2.5 active:scale-95 transition-transform">⚠️ Flag (${report.flags || 0}/5)</button>
                         <div class="time-text mt-2">Time: ${report.time}</div>
                     </div>
                 `;
-                if(feed) feed.prepend(card);
-            });
-
-            localStores.forEach(store => {
-                const currentReport = activeStoreStatus[store.key];
-                const status = currentReport ? currentReport.status : 'Unknown';
-                
-                const pin = document.createElement('div');
-                pin.className = `map-pin color-${status}`;
-                pin.style.left = `${store.x}px`;
-                pin.style.top = `${store.y}px`;
-                pin.onclick = () => inspectStore(store.key);
-                
-                const label = document.createElement('span');
-                label.className = "pin-label";
-                label.innerText = store.name;
-                
-                pin.appendChild(label);
-                if(pinsLayer) pinsLayer.appendChild(pin);
+                feed.prepend(card);
             });
         }
 
@@ -390,7 +310,7 @@
             const note = document.getElementById('reportNote').value;
 
             if(!selectedStoreKey || !setInput) {
-                alert("Input Error: Select a store and input a matching TCG set item from the filter menus before broadcasting updates.");
+                alert("Input Error: Search and select an active Store and Target Set from the dropdown input bars before broadcasting updates.");
                 return;
             }
 
@@ -417,6 +337,7 @@
             selectedSetName = "";
 
             renderApp();
+            if(document.getElementById('globalSearchInput').value) runGlobalSearch();
         }
 
         renderApp();
