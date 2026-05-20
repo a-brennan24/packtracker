@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PackTracker Ireland</title>
-    <!-- Tailwind CSS for modern mobile layout styling -->
+    <!-- Tailwind CSS for clean mobile styling -->
     <script src="https://tailwindcss.com"></script>
     <style>
         body { background-color: #f0fdfa; font-family: system-ui, -apple-system, sans-serif; }
@@ -24,41 +24,62 @@
     <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
-            <span class="text-xs bg-teal-800 px-2.5 py-1 rounded-full font-medium">Native Search Engine</span>
+            <span class="text-xs bg-teal-800 px-2.5 py-1 rounded-full font-medium">Split Engine UI</span>
         </div>
     </header>
 
     <main class="max-w-md mx-auto p-4 space-y-5">
         
-        <!-- SECTION 1: MASTER SEARCH ENGINE (STORES OR SETS) -->
+        <!-- SECTION 1: GLOBAL SEARCH ENGINE (STORES, SETS, OR COUNTIES) -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-3">
-            <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">🔍 Global Search Engine</h2>
-            <p class="text-xs text-slate-500">Instantly look up a store name, town, or TCG set to check live shelf statuses.</p>
+            <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">1. Global Search Engine</h2>
+            <p class="text-xs text-slate-500">Filter live logs by typing a store name, set title, or full **County** (e.g., Cork, Dublin).</p>
             
             <div class="relative">
-                <input type="text" id="globalSearchInput" oninput="runGlobalSearch()" placeholder="Type a store or set name (e.g. Smyths, Mega, 151)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
+                <input type="text" id="globalSearchInput" oninput="runGlobalSearch()" placeholder="Search store, set, or county..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
             </div>
             
             <div id="searchResultsContainer" class="space-y-2 pt-1"></div>
         </div>
 
-        <!-- SECTION 2: LOG LOGS & BROADCAST NEW SHELF FILE UPDATES -->
+        <!-- NEW SECTION 2: DEDICATED STORE REGISTRATION BOX -->
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
-            <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">📝 Log a Shelf Report</h2>
+            <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">2. Add a New Retail Store</h2>
+            <p class="text-xs text-slate-500">Store missing from the dropdown tracker below? Add its details here instantly.</p>
             
-            <!-- Store Autocomplete Selector via native data list list element -->
+            <div class="grid grid-cols-3 gap-2">
+                <div class="col-span-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">New Store Title</label>
+                    <input type="text" id="newStoreNameInput" placeholder="e.g. Tesco Superstore Bandon..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">County</label>
+                    <select id="newStoreCountySelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                        <option value="Antrim">Antrim</option><option value="Armagh">Armagh</option><option value="Carlow">Carlow</option><option value="Cavan">Cavan</option><option value="Clare">Clare</option><option value="Cork" selected>Cork</option><option value="Derry">Derry</option><option value="Donegal">Donegal</option><option value="Down">Down</option><option value="Dublin">Dublin</option><option value="Fermanagh">Fermanagh</option><option value="Galway">Galway</option><option value="Kerry">Kerry</option><option value="Kildare">Kildare</option><option value="Kilkenny">Kilkenny</option><option value="Laois">Laois</option><option value="Leitrim">Leitrim</option><option value="Limerick">Limerick</option><option value="Longford">Longford</option><option value="Louth">Louth</option><option value="Mayo">Mayo</option><option value="Meath">Meath</option><option value="Monaghan">Monaghan</option><option value="Offaly">Offaly</option><option value="Roscommon">Roscommon</option><option value="Sligo">Sligo</option><option value="Tipperary">Tipperary</option><option value="Tyrone">Tyrone</option><option value="Waterford">Waterford</option><option value="Westmeath">Westmeath</option><option value="Wexford">Wexford</option><option value="Wicklow">Wicklow</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="createNewStoreNatively()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl transition-all shadow-md text-sm active:scale-[0.99]">
+                ➕ Save New Location to Database
+            </button>
+        </div>
+
+        <!-- SECTION 3: LOG LOGS & BROADCAST NEW SHELF FILE UPDATES -->
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
+            <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">3. Log a Shelf Report</h2>
+            
+            <!-- Store Selector Bar using completely locked database options list -->
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">1. Select Store Location</label>
-                <input type="text" id="storeSearchInput" list="storeDataList" placeholder="Type store name or town..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <datalist id="storeDataList">
-                    <!-- JavaScript dynamically manages list parameters natively here -->
-                </datalist>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Tracked Store Location</label>
+                <input type="text" id="storeSearchInput" list="storeDataList" placeholder="Type or click to choose saved shop location..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <datalist id="storeDataList"></datalist>
             </div>
 
             <!-- TCG Dropdowns -->
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">2. Select Game System</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Game System</label>
                     <select id="gameSelect" onchange="onGameSystemChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
                         <option value="pokemon-en">Pokémon (English)</option>
                         <option value="pokemon-jp">Pokémon (Japanese)</option>
@@ -69,7 +90,7 @@
                 </div>
 
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">3. Stock Status</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Stock Status</label>
                     <select id="statusSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
                         <option value="Full" class="text-green-600">🟢 Full Stock</option>
                         <option value="Low" class="text-yellow-600">🟡 Low Stock</option>
@@ -78,19 +99,17 @@
                 </div>
             </div>
 
-            <!-- Expansion List Search Filter Bar using native elements -->
+            <!-- TCG Set Search Filter Bar using native elements -->
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">4. Select TCG Expansion Set</label>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select TCG Expansion Set</label>
                 <input type="text" id="setSearchInput" list="setDataList" placeholder="Search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <datalist id="setDataList">
-                    <!-- Options load smoothly depending on dropdown index choice -->
-                </datalist>
+                <datalist id="setDataList"></datalist>
             </div>
 
             <!-- Custom text comment notes box -->
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">5. Custom Note (Optional)</label>
-                <input type="text" id="reportNote" placeholder="e.g. Kept behind customer desk, limit 2 packs max..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Custom Note (Optional)</label>
+                <input type="text" id="reportNote" placeholder="e.g. Limit 2 boxes per person, items located inside checkout lane..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
             </div>
 
             <button onclick="submitReport()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-teal-100 active:scale-[0.98]">
@@ -98,9 +117,9 @@
             </button>
         </div>
 
-        <!-- SECTION 3: LIVE RECENT FEED UPDATES TRACK TIMELINE TIMESTAMPS -->
+        <!-- SECTION 4: LIVE RECENT FEED UPDATES TRACK TIMELINE TIMESTAMPS -->
         <div class="space-y-2.5">
-            <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider px-1">📋 Live Feed Updates</h3>
+            <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider px-1">4. Live Feed Updates</h3>
             <div id="feedContainer" class="space-y-2"></div>
         </div>
 
@@ -108,9 +127,9 @@
 
     <script>
         let localStores = JSON.parse(localStorage.getItem('pt_stores')) || [
-            { key: "smyths-cork", name: "Smyths Toys Kinsale Rd (Cork)" },
-            { key: "tesco-midleton", name: "Tesco Superstore Midleton" },
-            { key: "geek-retreat-dublin", name: "Geek Retreat (Dublin)" }
+            { key: "smyths-cork", name: "Smyths Toys Kinsale Rd", county: "Cork" },
+            { key: "tesco-midleton", name: "Tesco Superstore Midleton", county: "Cork" },
+            { key: "geek-retreat-dublin", name: "Geek Retreat", county: "Dublin" }
         ];
 
         let cachedSetsDatabase = {
@@ -126,7 +145,7 @@
         ];
 
         function runGlobalSearch() {
-            const query = document.getElementById('globalSearchInput').value.toLowerCase();
+            const query = document.getElementById('globalSearchInput').value.toLowerCase().trim();
             const container = document.getElementById('searchResultsContainer');
             container.innerHTML = '';
 
@@ -135,8 +154,10 @@
             const filteredReports = reports.filter(r => {
                 const storeObj = localStores.find(s => s.key === r.storeKey);
                 const storeName = storeObj ? storeObj.name.toLowerCase() : '';
+                const countyName = storeObj ? storeObj.county.toLowerCase() : '';
                 const setName = r.set.toLowerCase();
-                return storeName.includes(query) || setName.includes(query);
+                
+                return storeName.includes(query) || setName.includes(query) || countyName === query || countyName.includes(query);
             });
 
             if(filteredReports.length === 0) {
@@ -153,8 +174,11 @@
                 card.className = "feed-card border-teal-200 bg-teal-50/30";
                 card.innerHTML = `
                     <div style="flex:1; padding-right:12px;">
-                        <strong class="text-teal-950 text-sm">${storeObj ? storeObj.name : 'Store Node'}</strong>
-                        <div class="text-xs text-teal-700 font-medium mt-0.5">${report.set}</div>
+                        <div class="flex items-center gap-1.5">
+                            <strong class="text-teal-950 text-sm">${storeObj ? storeObj.name : 'Store Node'}</strong>
+                            <span class="text-[10px] bg-teal-100 text-teal-800 px-1.5 py-0.2 rounded border border-teal-200 font-bold uppercase font-mono">${storeObj ? storeObj.county : 'IE'}</span>
+                        </div>
+                        <div class="text-xs text-teal-700 font-medium mt-1">${report.set}</div>
                         ${report.note ? `<div class="text-[11px] text-slate-600 bg-white border p-1.5 rounded mt-1.5 font-mono">Note: ${report.note}</div>` : ''}
                     </div>
                     <div class="text-right flex flex-col items-end">
@@ -166,7 +190,36 @@
             });
         }
 
-        // Populates native option layers dynamically into the browser system memory structure
+        // NEW ISOLATED ACTION: Explicitly adds a store node cleanly to the structural data array index
+        function createNewStoreNatively() {
+            const storeName = document.getElementById('newStoreNameInput').value.trim();
+            const countySelected = document.getElementById('newStoreCountySelect').value;
+
+            if(!storeName) {
+                alert("Input Error: Please fill inside the store title text field before attempting to save.");
+                return;
+            }
+
+            // Guard rails verify the store text block hasn't been saved already
+            let exists = localStores.find(s => s.name.toLowerCase() === storeName.toLowerCase());
+            if(exists) {
+                alert(`Platform Warning: A retail store named "${storeName}" is already registered in the list tracker dashboard.`);
+                return;
+            }
+
+            const newKey = storeName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            const storeObject = { key: newKey, name: storeName, county: countySelected };
+            
+            localStores.push(storeObject);
+            localStorage.setItem('pt_stores', JSON.stringify(localStores));
+            
+            // Clear input box and refresh datalist indicators instantly
+            document.getElementById('newStoreNameInput').value = '';
+            alert(`Success: "${storeName} (${countySelected})" has been registered. You can now select it in Section 3!`);
+            
+            renderApp();
+        }
+
         function populateStoreDatalist() {
             const list = document.getElementById('storeDataList');
             list.innerHTML = '';
@@ -223,8 +276,11 @@
                 card.className = "feed-card";
                 card.innerHTML = `
                     <div style="flex:1; padding-right:12px;">
-                        <strong class="text-slate-900 text-sm">${storeObj ? storeObj.name : 'Added Location Node'}</strong>
-                        <div class="text-xs text-slate-500 font-medium mt-0.5">${report.set}</div>
+                        <div class="flex items-center gap-1.5">
+                            <strong class="text-slate-900 text-sm">${storeObj ? storeObj.name : 'Added Location Node'}</strong>
+                            <span class="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 font-bold uppercase">${storeObj ? storeObj.county : 'IE'}</span>
+                        </div>
+                        <div class="text-xs text-slate-500 font-medium mt-1">${report.set}</div>
                         ${report.note ? `<div class="text-[11px] text-slate-600 bg-slate-50 border p-1.5 rounded mt-1.5 font-mono">${report.note}</div>` : ''}
                     </div>
                     <div class="text-right flex flex-col items-end justify-between">
@@ -247,18 +303,16 @@
             const note = document.getElementById('reportNote').value;
 
             if(!storeInputName || !setInputName) {
-                alert("Input Error: Type and choose a Store name and target Expansion Set before broadcasting updates.");
+                alert("Input Error: Choose a registered Store title and select a target Expansion Set before logging your update ticket.");
                 return;
             }
 
-            // If the user entered a totally new store name, automatically save it right to the database list arrays
+            // Verifies the user selected an actual store location entry that was generated inside block 2
             let matchedStore = localStores.find(s => s.name.toLowerCase() === storeInputName.toLowerCase());
             
             if(!matchedStore) {
-                const newKey = storeInputName.toLowerCase().replace(/[^a-z0-9]/g, '-');
-                matchedStore = { key: newKey, name: storeInputName };
-                localStores.push(matchedStore);
-                localStorage.setItem('pt_stores', JSON.stringify(localStores));
+                alert("Location Error: The store name you entered is not registered yet. Please type its title inside Section 2 to save it to the system first!");
+                return;
             }
 
             const now = new Date();
