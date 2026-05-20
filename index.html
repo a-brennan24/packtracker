@@ -9,9 +9,6 @@
     <style>
         body { background-color: #f0fdfa; font-family: system-ui, -apple-system, sans-serif; }
         .breeze-bg { background-color: #f0fdfa; }
-        .search-results-box { position: absolute; width: 100%; max-height: 220px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .search-item { padding: 12px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f1f5f9; }
-        .search-item:hover { background: #f0fdfa; color: #0d9488; font-weight: 500; }
         .feed-card { background: white; padding: 16px; border-radius: 12px; border: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
         .badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; border: 1px solid; white-space: nowrap; }
         .badge-Full { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
@@ -21,13 +18,13 @@
         .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
     </style>
 </head>
-<body class="breeze-bg text-slate-800 pb-24" onclick="closeAllDropdownsGlobal(event)">
+<body class="breeze-bg text-slate-800 pb-24">
 
     <!-- App Header Navbar -->
     <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
-            <span class="text-xs bg-teal-800 px-2.5 py-1 rounded-full font-medium">Text Radar Engine</span>
+            <span class="text-xs bg-teal-800 px-2.5 py-1 rounded-full font-medium">Native Search Engine</span>
         </div>
     </header>
 
@@ -46,20 +43,22 @@
         </div>
 
         <!-- SECTION 2: LOG LOGS & BROADCAST NEW SHELF FILE UPDATES -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4" onclick="event.stopPropagation()">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">📝 Log a Shelf Report</h2>
             
-            <!-- Store Selector Bar -->
-            <div class="relative">
+            <!-- Store Autocomplete Selector via native data list list element -->
+            <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">1. Select Store Location</label>
-                <input type="text" id="storeSearchInput" oninput="filterStoreFormSearch()" onfocus="filterStoreFormSearch()" placeholder="Type store name or town..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
-                <div id="storeSearchResults" class="search-results-box hidden"></div>
+                <input type="text" id="storeSearchInput" list="storeDataList" placeholder="Type store name or town..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <datalist id="storeDataList">
+                    <!-- JavaScript dynamically manages list parameters natively here -->
+                </datalist>
             </div>
 
             <!-- TCG Dropdowns -->
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">2. Game System</label>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">2. Select Game System</label>
                     <select id="gameSelect" onchange="onGameSystemChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
                         <option value="pokemon-en">Pokémon (English)</option>
                         <option value="pokemon-jp">Pokémon (Japanese)</option>
@@ -79,11 +78,13 @@
                 </div>
             </div>
 
-            <!-- TCG Set Search Filter Bar -->
-            <div class="relative">
+            <!-- Expansion List Search Filter Bar using native elements -->
+            <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">4. Select TCG Expansion Set</label>
-                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" onfocus="filterGlobalSetSearch()" placeholder="Search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
-                <div id="setSearchResults" class="search-results-box hidden"></div>
+                <input type="text" id="setSearchInput" list="setDataList" placeholder="Search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <datalist id="setDataList">
+                    <!-- Options load smoothly depending on dropdown index choice -->
+                </datalist>
             </div>
 
             <!-- Custom text comment notes box -->
@@ -111,9 +112,6 @@
             { key: "tesco-midleton", name: "Tesco Superstore Midleton" },
             { key: "geek-retreat-dublin", name: "Geek Retreat (Dublin)" }
         ];
-
-        let selectedStoreKey = null;
-        let selectedSetName = "";
 
         let cachedSetsDatabase = {
             "pokemon-en": ["Pokémon: Mega Evolution Perfect Order", "Pokémon: Mega Evolution Initial Strike", "Pokémon: Legends Z-A Mega Chronicles", "Scarlet & Violet: Prismatic Evolutions", "Scarlet & Violet: Surging Sparks", "Scarlet & Violet: Shrouded Fable", "Scarlet & Violet: 151 Collection"],
@@ -168,93 +166,33 @@
             });
         }
 
-        function filterStoreFormSearch() {
-            const query = document.getElementById('storeSearchInput').value.toLowerCase();
-            const resultsBox = document.getElementById('storeSearchResults');
-            resultsBox.innerHTML = '';
-            
-            resultsBox.classList.remove('hidden');
-
-            const filtered = localStores.filter(s => s.name.toLowerCase().includes(query));
-            filtered.forEach(store => {
-                const row = document.createElement('div');
-                row.className = "search-item";
-                row.innerText = store.name;
-                row.onclick = (e) => {
-                    e.stopPropagation(); // Stops event bubbling issues completely
-                    document.getElementById('storeSearchInput').value = store.name;
-                    selectedStoreKey = store.key;
-                    resultsBox.classList.add('hidden');
-                };
-                resultsBox.appendChild(row);
+        // Populates native option layers dynamically into the browser system memory structure
+        function populateStoreDatalist() {
+            const list = document.getElementById('storeDataList');
+            list.innerHTML = '';
+            localStores.forEach(store => {
+                const opt = document.createElement('option');
+                opt.value = store.name;
+                list.appendChild(opt);
             });
-
-            if(filtered.length === 0 && query.length > 0) {
-                const addRow = document.createElement('div');
-                addRow.className = "search-item text-teal-600 font-bold";
-                addRow.innerText = `➕ Add New Location: "${document.getElementById('storeSearchInput').value}"`;
-                addRow.onclick = (e) => {
-                    e.stopPropagation();
-                    const name = document.getElementById('storeSearchInput').value;
-                    const key = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
-                    const newStore = { key: key, name: name };
-                    
-                    localStores.push(newStore);
-                    localStorage.setItem('pt_stores', JSON.stringify(localStores));
-                    selectedStoreKey = key;
-                    resultsBox.classList.add('hidden');
-                    renderApp();
-                };
-                resultsBox.appendChild(addRow);
-            }
         }
 
         function onGameSystemChange() {
             document.getElementById('setSearchInput').value = "";
-            selectedSetName = "";
+            populateSetDatalist();
         }
 
-        function filterGlobalSetSearch() {
+        function populateSetDatalist() {
             const selectedSystem = document.getElementById('gameSelect').value;
-            const query = document.getElementById('setSearchInput').value.toLowerCase();
-            const resultsBox = document.getElementById('setSearchResults');
-            resultsBox.innerHTML = '';
-            
-            resultsBox.classList.remove('hidden');
+            const list = document.getElementById('setDataList');
+            list.innerHTML = '';
 
             const targetSetArray = cachedSetsDatabase[selectedSystem] || [];
-            const filtered = targetSetArray.filter(setName => setName.toLowerCase().includes(query));
-
-            filtered.slice(0, 15).forEach(setName => {
-                const row = document.createElement('div');
-                row.className = "search-item";
-                row.innerText = setName;
-                row.onclick = (e) => {
-                    e.stopPropagation();
-                    document.getElementById('setSearchInput').value = setName;
-                    selectedSetName = setName;
-                    resultsBox.classList.add('hidden');
-                };
-                resultsBox.appendChild(row);
+            targetSetArray.forEach(setName => {
+                const opt = document.createElement('option');
+                opt.value = setName;
+                list.appendChild(opt);
             });
-
-            if(filtered.length === 0 && query.length > 0) {
-                const manualRow = document.createElement('div');
-                manualRow.className = "search-item text-slate-500 italic";
-                manualRow.innerText = `Use custom input: "${document.getElementById('setSearchInput').value}"`;
-                manualRow.onclick = (e) => {
-                    e.stopPropagation();
-                    selectedSetName = document.getElementById('setSearchInput').value;
-                    resultsBox.classList.add('hidden');
-                };
-                resultsBox.appendChild(manualRow);
-            }
-        }
-
-        // NEW GLOBAL HANDLER: Tapping anywhere else on the screen forcefully drops the popup frames instantly
-        function closeAllDropdownsGlobal(e) {
-            document.getElementById('storeSearchResults').classList.add('hidden');
-            document.getElementById('setSearchResults').classList.add('hidden');
         }
 
         function flagReport(id) {
@@ -297,16 +235,30 @@
                 `;
                 feed.prepend(card);
             });
+
+            populateStoreDatalist();
+            populateSetDatalist();
         }
 
         function submitReport() {
-            const setInput = document.getElementById('setSearchInput').value;
+            const storeInputName = document.getElementById('storeSearchInput').value.trim();
+            const setInputName = document.getElementById('setSearchInput').value.trim();
             const status = document.getElementById('statusSelect').value;
             const note = document.getElementById('reportNote').value;
 
-            if(!selectedStoreKey || !setInput) {
-                alert("Input Error: Search and select an active Store and Target Set from the dropdown input bars before broadcasting updates.");
+            if(!storeInputName || !setInputName) {
+                alert("Input Error: Type and choose a Store name and target Expansion Set before broadcasting updates.");
                 return;
+            }
+
+            // If the user entered a totally new store name, automatically save it right to the database list arrays
+            let matchedStore = localStores.find(s => s.name.toLowerCase() === storeInputName.toLowerCase());
+            
+            if(!matchedStore) {
+                const newKey = storeInputName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                matchedStore = { key: newKey, name: storeInputName };
+                localStores.push(matchedStore);
+                localStorage.setItem('pt_stores', JSON.stringify(localStores));
             }
 
             const now = new Date();
@@ -314,8 +266,8 @@
 
             const newReport = {
                 id: Date.now(),
-                storeKey: selectedStoreKey,
-                set: setInput,
+                storeKey: matchedStore.key,
+                set: setInputName,
                 status: status,
                 note: note,
                 flags: 0,
@@ -328,8 +280,6 @@
             document.getElementById('storeSearchInput').value = '';
             document.getElementById('setSearchInput').value = '';
             document.getElementById('reportNote').value = '';
-            selectedStoreKey = null;
-            selectedSetName = "";
 
             renderApp();
             if(document.getElementById('globalSearchInput').value) runGlobalSearch();
