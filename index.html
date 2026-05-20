@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PackTracker Ireland</title>
-    <!-- Tailwind CSS for clean mobile styling -->
+    <!-- Tailwind CSS for modern mobile layout styling -->
     <script src="https://tailwindcss.com"></script>
     <style>
         body { background-color: #f0fdfa; font-family: system-ui, -apple-system, sans-serif; }
@@ -16,6 +16,8 @@
         .badge-Out { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
         .badge-Unknown { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
         .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+        /* Smooth pop-up overlay styles */
+        .modal-overlay { transition: opacity 0.25s ease; }
     </style>
 </head>
 <body class="breeze-bg text-slate-800 pb-24">
@@ -24,9 +26,47 @@
     <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
-            <span class="text-xs bg-teal-800 px-2.5 py-1 rounded-full font-medium">Split Engine UI</span>
+            <!-- NEW FEATURE: Interactive Info Manual Icon Button -->
+            <button onclick="toggleManualModal(true)" class="bg-teal-700 hover:bg-teal-800 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-teal-500 shadow-sm focus:outline-none active:scale-95" title="View Guide Manual">ℹ️</button>
         </div>
     </header>
+
+    <!-- NEW FEATURE: Native Light Guide Manual Pop-up Modal Container -->
+    <div id="manualModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-[100] flex items-center justify-center p-4 hidden opacity-0 modal-overlay">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-teal-100 max-h-[85vh] overflow-y-auto space-y-4">
+            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
+                <h3 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">📖 PackTracker Manual</h3>
+                <button onclick="toggleManualModal(false)" class="text-slate-400 hover:text-slate-600 font-bold text-xl focus:outline-none p-1">✕</button>
+            </div>
+            
+            <div class="space-y-3.5 text-sm text-slate-600 leading-relaxed">
+                <div>
+                    <strong class="text-teal-700 block mb-0.5">🔍 1. Global Search Engine</strong>
+                    <p>Type any county (e.g., "Cork"), specific store title, or TCG expansion set name into the search bar. The engine filters all logs instantly to isolate target shelves.</p>
+                </div>
+                <div>
+                    <strong class="text-teal-700 block mb-0.5">🏪 2. Add New Retail Stores</strong>
+                    <p>If your local store is missing from the selector index list, input its name into Section 2, choose its official Irish county, and tap save to link it globally.</p>
+                </div>
+                <div>
+                    <strong class="text-teal-700 block mb-0.5">📝 3. Log a Shelf Report</strong>
+                    <p>Select your saved store, toggle the card game network, pick the availability level, and broadcast your update. Use custom notes for shelf details.</p>
+                </div>
+                <div>
+                    <strong class="text-teal-700 block mb-0.5">⏳ 4. 48-Hour Auto-Expiry Filter</strong>
+                    <p>TCG shelves change incredibly fast. To keep files accurate, all community updates automatically age out and disappear from the log feed after exactly 48 hours.</p>
+                </div>
+                <div>
+                    <strong class="text-teal-700 block mb-0.5">⚠️ 5. Community Moderation</strong>
+                    <p>Spot an inaccurate entry or troll? Tap the Flag button next to the post log card. Once any stock report hits 5 flags, the algorithm forces an automatic status reset.</p>
+                </div>
+            </div>
+
+            <button onclick="toggleManualModal(false)" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 rounded-xl shadow-md transition-all active:scale-[0.98] text-sm mt-2">
+                Got it, Let's Track!
+            </button>
+        </div>
+    </div>
 
     <main class="max-w-md mx-auto p-4 space-y-5">
         
@@ -69,11 +109,9 @@
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">3. Log a Shelf Report</h2>
             
-            <!-- Store Selector Bar using completely locked database options list -->
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Tracked Store Location</label>
                 <input type="text" id="storeSearchInput" list="storeDataList" placeholder="Type or click to choose saved shop location..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <div id="storeSearchResults" class="search-results-box hidden"></div>
                 <datalist id="storeDataList"></datalist>
             </div>
 
@@ -128,41 +166,72 @@
     </main>
 
     <script>
-        // Master hardcoded source list
         const masterDefaultStores = [
             { key: "smyths-cork", name: "Smyths Toys Kinsale Rd", county: "Cork" },
             { key: "tesco-midleton", name: "Tesco Superstore Midleton", county: "Cork" },
             { key: "geek-retreat-dublin", name: "Geek Retreat", county: "Dublin" }
         ];
 
-        // Fetch from storage or fall back to defaults
         let localStores = JSON.parse(localStorage.getItem('pt_stores')) || masterDefaultStores;
 
-        // SELF-HEALING PATCH: Safely cycles through old cache rows and hooks missing counties without wiping records
         localStores.forEach(store => {
             if (!store.county || store.county === "undefined") {
                 const match = masterDefaultStores.find(m => m.key === store.key);
-                store.county = match ? match.county : "Cork"; // Fallback to Cork if all else fails
+                store.county = match ? match.county : "Cork"; 
             }
         });
         localStorage.setItem('pt_stores', JSON.stringify(localStores));
 
         let cachedSetsDatabase = {
             "pokemon-en": [   
-            /*Mega Evolution*/"Mega Evolution: Chaos Rising", "Mega Evolution: Perfect Order", "Mega Evolution: Ascended Heroes", "Mega Evolution: Phantasmal Flames", "Mega Evolution: Base Set", 
-            /*Scarlet & Violet*/"Scarlet & Violet: White Flare", "Scarlet & Violet: Black Bolt", "Scarlet & Violet: Destined Rivals", "Scarlet & Violet: Journey Together", "Scarlet & Violet: Prismatic Evolutions", "Scarlet & Violet: Surging Sparks", "Scarlet & Violet: Stellar Crown", "Scarlet & Violet: Shrouded Fable", "Scarlet & Violet: Twilight Mascarade", "Scarlet & Violet: Temporal Forces", "Scarlet & Violet: Paladean Fates", "Scarlet & Violet: Paradox Rift", "Scarlet & Violet: 151 Collection", "Scarlet & Violet: Obsidian Flames", "Scarlet & Violet: Paldea Evolved", "Scarlet & Violet: Base Set"],
-            
+                "Mega Evolution: Chaos Rising", "Mega Evolution: Perfect Order", "Mega Evolution: Ascended Heroes", "Mega Evolution: Phantasmal Flames", "Mega Evolution: Base Set", 
+                "Scarlet & Violet: White Flare", "Scarlet & Violet: Black Bolt", "Scarlet & Violet: Destined Rivals", "Scarlet & Violet: Journey Together", "Scarlet & Violet: Prismatic Evolutions", "Scarlet & Violet: Surging Sparks", "Scarlet & Violet: Stellar Crown", "Scarlet & Violet: Shrouded Fable", "Scarlet & Violet: Twilight Mascarade", "Scarlet & Violet: Temporal Forces", "Scarlet & Violet: Paladean Fates", "Scarlet & Violet: Paradox Rift", "Scarlet & Violet: 151 Collection", "Scarlet & Violet: Obsidian Flames", "Scarlet & Violet: Paldea Evolved", "Scarlet & Violet: Base Set"
+            ],
             "pokemon-jp": ["Mega Awakening (SV9)", "Lumiose Legends (SV9a)", "Terastal Festival (SV8a)", "Pokémon Card 151 (SV2a)"],
             "lorcana": ["Azurite Sea (Chapter 6)", "Shimmering Skies (Chapter 5)", "Into the Inklands (Chapter 3)"],
             "yugioh": ["The Infinite Forbidden", "Legacy of Destruction", "Phantom Nightmare"],
-            "mtg": ["Foundations (FDN)", "Duskmourn: House of Horror (DSK)", "Bloomburrow (BLB)"]
+            "mtg": ["Foundations (FDN)", "Duskmourn: House of Horror (DSK)", "Bloomburrow (BLB)"],
+            "op": [
+                "OP-09: New Emperor", "OP-08: Two Legends", "OP-07: 500 Years into the Future", "OP-06: Wings of the Captain", "OP-05: Awakening of the New Era", "OP-04: Kingdoms of Intrigue", "OP-03: Pillars of Strength", "OP-02: Paramount War", "OP-01: Romance Dawn", "PRB-01: Premium Booster"
+            ]
         };
 
+        // Preloaded baseline log entry containing a functional raw epoch millisecond stamp coordinates calculation
         let reports = JSON.parse(localStorage.getItem('tcg_reports')) || [
-            { id: 1, storeKey: "smyths-cork", set: "Pokémon: Mega Evolution Perfect Order", status: "Low", note: "Hanger racks filled behind customer service.", flags: 0, time: "Just now" }
+            { id: 1, storeKey: "smyths-cork", set: "Pokémon: Mega Evolution Perfect Order", status: "Low", note: "Hanger racks filled behind customer service.", flags: 0, timestamp: Date.now(), time: "Just now" }
         ];
 
+        // NEW FEATURE: Toggles manual modal window layout states smoothly
+        function toggleManualModal(show) {
+            const modal = document.getElementById('manualModal');
+            if (show) {
+                modal.classList.remove('hidden');
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            } else {
+                modal.classList.add('opacity-0');
+                setTimeout(() => modal.classList.add('hidden'), 250);
+            }
+        }
+
+        // NEW FEATURE: 48-Hour Auto-Expiry engine logic filter. Runs instantly upon page request execution
+        function filterExpiredReports() {
+            const fortyEightHoursInMs = 48 * 60 * 60 * 1000;
+            const now = Date.now();
+            
+            // Filters out and preserves only reports written within the 48-hour time loop horizon
+            const unexpiredReports = reports.filter(report => {
+                const reportTime = report.timestamp || Date.now();
+                return (now - reportTime) < fortyEightHoursInMs;
+            });
+
+            if (unexpiredReports.length !== reports.length) {
+                reports = unexpiredReports;
+                localStorage.setItem('tcg_reports', JSON.stringify(reports));
+            }
+        }
+
         function runGlobalSearch() {
+            filterExpiredReports(); // Sanitize dataset rules before running lookup queries
             const query = document.getElementById('globalSearchInput').value.toLowerCase().trim();
             const container = document.getElementById('searchResultsContainer');
             container.innerHTML = '';
@@ -278,6 +347,7 @@
         }
 
         function renderApp() {
+            filterExpiredReports(); // Run cleanup sequence prior to compiling live timeline display vectors
             const feed = document.getElementById('feedContainer');
             if(!feed) return;
             feed.innerHTML = '';
@@ -339,6 +409,7 @@
                 status: status,
                 note: note,
                 flags: 0,
+                timestamp: Date.now(), // Logs the exact real-world timestamp loop calculation for 48h filtering metrics
                 time: timeString
             };
 
