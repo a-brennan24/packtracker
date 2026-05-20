@@ -4,223 +4,396 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PackTracker Ireland</title>
-    <!-- Custom embedded styling so the app works perfectly without external packages -->
+    <!-- Tailwind CSS for mobile layout styling -->
+    <script src="https://tailwindcss.com"></script>
     <style>
-        body { background-color: #f0fdfa; font-family: system-ui, -apple-system, sans-serif; margin: 0; padding-bottom: 80px; color: #1e293b; }
-        header { background-color: #0d9488; color: white; padding: 16px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); text-align: center; position: sticky; top: 0; z-index: 50; }
-        main { max-width: 450px; margin: 0 auto; padding: 16px; box-sizing: border-box; }
-        .box { background: white; padding: 16px; border-radius: 12px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); border: 1px solid #ccfbf1; margin-bottom: 16px; }
-        h1 { margin: 0; font-size: 20px; font-weight: bold; tracking-wide: 1px; }
-        h2 { margin-top: 0; color: #115e59; font-size: 16px; font-weight: bold; display: flex; align-items: center; gap: 6px; }
-        label { display: block; font-size: 11px; font-weight: bold; color: #64748b; text-transform: uppercase; margin-bottom: 4px; margin-top: 10px; }
-        select, button { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0; background: #f8fafc; font-size: 14px; box-sizing: border-box; font-weight: 500; }
-        select:focus { outline: 2px solid #0d9488; }
-        button { background: #0d9488; color: white; font-weight: bold; border: none; margin-top: 16px; cursor: pointer; box-shadow: 0 4px 6px rgba(13, 148, 136, 0.2); }
-        button:active { transform: scale(0.98); }
-        
-        /* Interactive Native Map Vector Box */
-        .map-container { position: relative; width: 100%; height: 320px; background: #e0f2fe; border-radius: 8px; border: 1px solid #bae6fd; overflow: hidden; }
-        .river-line { position: absolute; background: #38bdf8; height: 8px; width: 140%; transform: rotate(-15deg); top: 40%; left: -20%; }
-        .road-line { position: absolute; background: #94a3b8; }
-        .road-n71 { height: 6px; width: 120%; transform: rotate(20deg); top: 50%; left: -10%; }
-        .road-n27 { height: 120%; width: 6px; left: 65%; top: -10%; }
-        
-        /* Map Marker Nodes */
-        .map-pin { position: absolute; width: 16px; height: 16px; border-radius: 50%; border: 2px solid white; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transition: transform 0.1s; z-index: 10; }
-        .map-pin:active { transform: scale(0.9); }
-        .pin-label { position: absolute; background: rgba(15, 23, 42, 0.85); color: white; font-size: 9px; font-weight: bold; padding: 2px 6px; border-radius: 4px; border: 1px solid #334155; white-space: nowrap; pointer-events: none; transform: translate(-35%, -22px); }
-        
+        body { background-color: #f0fdfa; font-family: system-ui, -apple-system, sans-serif; }
+        .breeze-bg { background-color: #f0fdfa; }
+        .map-viewport { position: relative; width: 100%; height: 380px; background: #e0f2fe; overflow: hidden; cursor: grab; }
+        .map-viewport:active { cursor: grabbing; }
+        .map-surface { position: absolute; width: 1000px; height: 1000px; transform-origin: 0 0; background: #e0f2fe; transition: transform 0.05s linear; }
+        .map-pin { position: absolute; width: 18px; height: 18px; border-radius: 50%; border: 2px solid white; cursor: pointer; box-shadow: 0 2px 4px rgba(0,0,0,0.3); transform: translate(-50%, -50%); z-index: 10; }
+        .pin-label { position: absolute; background: rgba(15, 23, 42, 0.9); color: white; font-size: 10px; font-weight: bold; padding: 2px 6px; border-radius: 4px; border: 1px solid #334155; white-space: nowrap; pointer-events: none; transform: translate(-35%, -24px); }
         .color-Full { background-color: #22c55e; }
         .color-Low { background-color: #eab308; }
         .color-Out { background-color: #ef4444; }
-        .color-None { background-color: #64748b; }
-
-        .feed-card { background: white; padding: 14px; border-radius: 12px; border: 1px solid #f1f5f9; box-shadow: 0 1px 2px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
-        .badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; border: 1px solid; }
-        .badge-Full { bg-color: #bbf7d0; text-color: #16803d; border-color: #bbf7d0; background: #dcfce7; color: #166534; }
-        .badge-Low { background: #fef9c3; color: #854d0e; }
-        .badge-Out { background: #fee2e2; color: #991b1b; }
-        .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+        .color-Unknown { background-color: #64748b; }
+        .search-results-box { position: absolute; width: 100%; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; z-index: 100; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .search-item { padding: 10px 12px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f1f5f9; }
+        .search-item:hover { background: #f0fdfa; color: #0d9488; font-weight: 500; }
     </style>
 </head>
-<body>
+<body class="breeze-bg text-slate-800 pb-24">
 
-    <header>
-        <h1>⚡ PackTracker Ireland</h1>
-        <div style="font-size: 11px; opacity: 0.8; margin-top: 2px; font-weight: 500;">Local Crowdsourced TCG Radar</div>
+    <!-- App Header -->
+    <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
+            <span class="text-xs bg-teal-800 px-2.5 py-1 rounded-full font-medium">All TCG Live Database</span>
+        </div>
     </header>
 
-    <main>
+    <main class="max-w-md mx-auto p-4 space-y-4">
         
-        <!-- Live Vector Map Box -->
-        <div class="box" style="padding: 0; overflow: hidden;">
-            <div style="padding: 12px 16px; background: #f0fdfa; border-b: 1px solid #ccfbf1; display: flex; justify-content: space-between; align-items: center;">
-                <h2 style="margin: 0;">📍 County Cork Live Tracker Map</h2>
-                <span style="font-size: 10px; color: #64748b; font-weight: bold; background: white; padding: 2px 6px; border-radius: 4px; border: 1px solid #e2e8f0;">NATIVE ENG</span>
-            </div>
-            
-            <div class="map-container">
-                <!-- Native Geographical Layers (River Bandon & National Roads Mock Layout) -->
-                <div class="river-line"></div>
-                <div class="road-line road-n71"></div>
-                <div class="road-line road-n27"></div>
-
-                <!-- Store 1: The Comic Vault (Cork City Centre - Top Right Sector) -->
-                <div onclick="inspectStore('comic-vault-cork')" class="map-pin color-None" id="pin-comic-vault-cork" style="top: 20%; left: 63%;">
-                    <span class="pin-label">Cork City Centre</span>
-                </div>
-
-                <!-- Store 2: Smyths Toys (Kinsale Road - Mid Right Sector) -->
-                <div onclick="inspectStore('smyths-cork')" class="map-pin color-None" id="pin-smyths-cork" style="top: 48%; left: 61%;">
-                    <span class="pin-label">Smyths Toys</span>
-                </div>
-
-                <!-- Store 3: Tesco Superstore (Bandon - Bottom Left Sector) -->
-                <div onclick="inspectStore('tesco-bandon')" class="map-pin color-None" id="pin-tesco-bandon" style="top: 68%; left: 18%;">
-                    <span class="pin-label">Tesco Bandon</span>
+        <!-- Live Navigation Map Widget -->
+        <div class="bg-white rounded-xl shadow-sm border border-teal-100 overflow-hidden">
+            <div class="p-3 bg-teal-50 border-b border-teal-100 flex justify-between items-center">
+                <h2 class="font-semibold text-teal-900 flex items-center gap-1">📍 Live Navigation Radar</h2>
+                <div class="flex gap-1">
+                    <button onclick="adjustZoom(0.2)" class="bg-white border border-slate-200 text-slate-700 w-7 h-7 rounded font-bold flex items-center justify-center shadow-sm active:scale-90">+</button>
+                    <button onclick="adjustZoom(-0.2)" class="bg-white border border-slate-200 text-slate-700 w-7 h-7 rounded font-bold flex items-center justify-center shadow-sm active:scale-90">-</button>
                 </div>
             </div>
             
-            <!-- Dynamic Map Inspector Info Bar -->
-            <div style="background: #0f172a; color: white; padding: 12px; font-size: 13px;" id="inspectorPanel">
-                <span style="color: #38bdf8; font-weight: bold;">ℹ️ Map Inspection Active:</span> Tap any store location pin above to scan shelf files.
+            <div class="map-viewport" id="mapViewport">
+                <div class="map-surface" id="mapSurface">
+                    <svg width="1000" height="1000" style="position: absolute; top:0; left:0; pointer-events: none;">
+                        <path d="M 0 400 Q 300 450, 500 380 T 1000 420" fill="none" stroke="#38bdf8" stroke-width="12" />
+                        <path d="M 100 0 L 900 1000" fill="none" stroke="#94a3b8" stroke-width="6" stroke-dasharray="5,5" />
+                        <path d="M 0 200 L 1000 800" fill="none" stroke="#cbd5e1" stroke-width="4" />
+                    </svg>
+                    <div id="pinsLayer"></div>
+                </div>
+            </div>
+            
+            <div class="bg-slate-900 text-white p-4 text-sm" id="inspectorPanel">
+                <span class="text-teal-400 font-bold">ℹ️ Inspection Radar Active:</span> Use gestures to drag/zoom. Tap pin nodes to check active stock lists.
             </div>
         </div>
 
-        <!-- Submission Section -->
-        <div class="box">
-            <h2>📝 Log a Shelf Report</h2>
+        <!-- Submission Form -->
+        <div class="bg-white p-4 rounded-xl shadow-sm border border-teal-100 space-y-4">
+            <h2 class="font-bold text-lg text-teal-900 flex items-center gap-2">📝 Log a Shelf Report</h2>
             
-            <label>1. Select Irish Store</label>
-            <select id="storeSelect">
-                <option value="tesco-bandon">Tesco Superstore (Bandon, Cork)</option>
-                <option value="smyths-cork">Smyths Toys Superstores (Kinsale Rd, Cork)</option>
-                <option value="comic-vault-cork">The Comic Vault (Oliver Plunkett St, Cork)</option>
-            </select>
+            <!-- Store Selector -->
+            <div class="relative">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">1. Search or Add Store</label>
+                <input type="text" id="storeSearchInput" oninput="filterStoreSearch()" placeholder="Type to filter or name a new store..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
+                <div id="storeSearchResults" class="search-results-box hidden"></div>
+            </div>
 
-            <div style="display: flex; gap: 8px; margin-top: 10px;">
-                <div style="flex: 1;">
-                    <label>2. TCG Set</label>
-                    <select id="setSelect">
-                        <option value="Pokémon: Temporal Forces">Pokémon: Temporal Forces</option>
-                        <option value="Pokémon: Shrouded Fable">Pokémon: Shrouded Fable</option>
-                        <option value="Pokémon: 151 Box">Pokémon: 151 Box</option>
-                        <option value="Lorcana: Inklands">Lorcana: Inklands</option>
+            <!-- TCG Game Dropdown Filter -->
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">2. Select Game System</label>
+                    <select id="gameSelect" onchange="onGameSystemChange()" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                        <option value="pokemon-en">Pokémon (English)</option>
+                        <option value="pokemon-jp">Pokémon (Japanese)</option>
+                        <option value="lorcana">Disney Lorcana</option>
+                        <option value="yugioh">Yu-Gi-Oh!</option>
+                        <option value="mtg">Magic: The Gathering</option>
                     </select>
                 </div>
-                <div style="flex: 1;">
-                    <label>3. Shelf Level</label>
-                    <select id="statusSelect" style="font-weight: bold;">
-                        <option value="Full" style="color: #16a34a;">🟢 Full Stock</option>
-                        <option value="Low" style="color: #ca8a04;">🟡 Low Stock</option>
-                        <option value="Out" style="color: #dc2626;">🔴 Out of Stock</option>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">3. Status</label>
+                    <select id="statusSelect" class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 font-bold focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                        <option value="Full" class="text-green-600">🟢 Full Stock</option>
+                        <option value="Low" class="text-yellow-600">🟡 Low Stock</option>
+                        <option value="Out" class="text-red-600">🔴 Out of Stock</option>
                     </select>
                 </div>
             </div>
 
-            <button onclick="submitReport()">Broadcast Live Update</button>
+            <!-- Global TCG Set Search Bar -->
+            <div class="relative">
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">4. Search Expansion Set</label>
+                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" placeholder="Type set name (e.g. Shrouded Fable, Infinite Forbidden, Bloomburrow)..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
+                <div id="setSearchResults" class="search-results-box hidden"></div>
+            </div>
+
+            <!-- Custom User Notes -->
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">5. Custom Note (Optional)</label>
+                <input type="text" id="reportNote" placeholder="e.g., Kept at Customer Service desk, 3 items max limit..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+            </div>
+
+            <button onclick="submitReport()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-lg transition-all shadow-md shadow-teal-100 active:scale-[0.98]">
+                Broadcast Live Update
+            </button>
         </div>
 
-        <!-- Log Activity Feed -->
-        <h3 style="font-size: 12px; color: #64748b; text-transform: uppercase; letter-spacing: 1px; margin-left: 4px; margin-bottom: 8px;">Live Feed Activity Log</h3>
-        <div id="feedContainer"></div>
+        <!-- Activity Timeline Logs Feed -->
+        <div class="space-y-2">
+            <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider px-1">Live Feed Activity Log</h3>
+            <div id="feedContainer" class="space-y-2"></div>
+        </div>
 
     </main>
 
     <script>
-        const storeDetails = {
-            "tesco-bandon": { name: "Tesco Superstore Bandon", location: "Brooks Horgan Quay, Bandon" },
-            "smyths-cork": { name: "Smyths Toys Kinsale Rd", location: "Kinsale Road Retail Park, Cork" },
-            "comic-vault-cork": { name: "The Comic Vault Cork", location: "Oliver Plunkett St, Cork City" }
-        };
-
-        let reports = JSON.parse(localStorage.getItem('tcg_reports')) || [
-            { id: 1, storeKey: "tesco-bandon", set: "Pokémon: Temporal Forces", status: "Full", time: "10:15 AM" },
-            { id: 2, storeKey: "smyths-cork", set: "Pokémon: 151 Box", status: "Low", time: "09:44 AM" }
+        let localStores = JSON.parse(localStorage.getItem('pt_stores')) || [
+            { key: "tesco-bandon", name: "Tesco Superstore Bandon", x: 250, y: 650 },
+            { key: "smyths-cork", name: "Smyths Toys Kinsale Rd", x: 650, y: 480 },
+            { key: "comic-vault-cork", name: "The Comic Vault Cork City", x: 680, y: 220 }
         ];
 
+        let selectedStoreKey = null;
+        let selectedSetName = "";
+
+        // Core Live Database Index Object loaded asynchronously on selection changes
+        let cachedSetsDatabase = {
+            "pokemon-en": [
+                "Scarlet & Violet: Prismatic Evolutions", "Scarlet & Violet: Surging Sparks", "Scarlet & Violet: Shrouded Fable", "Scarlet & Violet: Twilight Masquerade", "Scarlet & Violet: Temporal Forces", "Scarlet & Violet: Paldean Fates", "Scarlet & Violet: Paradox Rift", "Scarlet & Violet: Obsidian Flames", "Scarlet & Violet: Paldea Evolved", "Scarlet & Violet Base Set", "Scarlet & Violet: 151 Special Collection", "Crown Zenith", "Silver Tempest", "Lost Origin", "Astral Radiance", "Brilliant Stars", "Evolving Skies", "Chilling Reign", "Battle Styles", "Vivid Voltage", "Darkness Ablaze", "Rebel Clash", "Sword & Shield Base Set", "Hidden Fates", "Unified Minds", "Unbroken Bonds", "Team Up", "Lost Thunder", "Celestial Storm", "Forbidden Light", "Ultra Prism", "Crimson Invasion", "Burning Shadows", "Guardians Rising", "Sun & Moon Base Set", "Evolutions", "Steam Siege", "Fates Collide", "Generations", "BREAKpoint", "BREAKthrough", "Ancient Origins", "Roaring Skies", "Primal Clash", "Phantom Forces", "Furious Fists", "Flashfire", "XY Base Set", "Plasma Blast", "Plasma Storm", "Boundaries Crossed", "Black & White Base Set"
+            ],
+            "pokemon-jp": [
+                "Terastal Festival (SV8a)", "Supercharged Breaker (SV8)", "Paradise Dragona (SV7a)", "stellar Miracle (SV7)", "Night Wanderer (SV6a)", "Mask of Change (SV6)", "Crimson Haze (SV5a)", "Cyber Judge (SV5M)", "Wild Force (SV5K)", "Shiny Treasure ex (SV4a)", "Ancient Roar (SV4K)", "Future Flash (SV4M)", "Raging Surf (SV3a)", "Ruler of the Black Flame (SV3)", "Pokémon Card 151 (SV2a)", "Clay Burst (SV2D)", "Snow Hazard (SV2P)", "Triplet Beat (SV1a)", "Scarlet ex (SV1S)", "Violet ex (SV1V)", "VSTAR Universe (S12a)", "Paradigm Trigger (S12)", "Incandescent Arcana (S11a)", "Lost Abyss (S11)", "Pokémon GO (S10b)", "Dark Phantasma (S10a)", "Space Juggler (S10P)", "Time Gazer (S10D)", "Battle Region (S9a)", "Star Birth (S9)", "VMAX Climax (S8b)", "25th Anniversary Collection", "Fusion Arts (S8)", "Eevee Heroes (S6a)", "Silver Lance (S6H)", "Jet-Black Spirit (S6K)", "Matchless Fighters (S5a)", "Shiny Star V (S4a)"
+            ],
+            "lorcana": [
+                "Azurite Sea (Chapter 6)", "Shimmering Skies (Chapter 5)", "Ursula's Return (Chapter 4)", "Into the Inklands (Chapter 3)", "Rise of the Floodborn (Chapter 2)", "The First Chapter (Chapter 1)"
+            ],
+            "yugioh": [
+                "The Infinite Forbidden", "Legacy of Destruction", "Phantom Nightmare", "Age of Overlord", "Nexus of Duelist", "Cyberstorm Access", "Photon Hypernova", "Darkwing Blast", "Power of the Elements", "Dimension Force", "Battle of Chaos", "Burst of Destiny", "Dawn of Majesty", "Lightning Overdrive", "Blazing Vortex", "Phantom Rage", "Rise of the Duelist", "Eternity Code", "Ignition Assault", "Chaos Impact", "Rising Rampage", "Dark Neostorm", "Savage Strike", "Soul Fusion", "Cybernetic Horizon", "Flames of Destruction", "Extreme Force", "Circuit Break", "Code of the Duelist", "Maximum Crisis", "Raging Tempest", "Invasion: Vengeance", "The Dark Illusion", "Shining Victories", "Breakers of Shadow", "Dimension of Chaos", "Clash of Rebellions", "Crossed Souls", "Secrets of Eternity", "The New Challengers", "Duelist Alliance", "Prismatic Art Collection", "Rarity Collection: Quarter Century Edition", "Magnificent Mavens", "Ghosts From the Past", "Duel Power"
+            ],
+            "mtg": [
+                "Foundations (FDN)", "Duskmourn: House of Horror (DSK)", "Bloomburrow (BLB)", "Modern Horizons 3 (MH3)", "Outlaws of Thunder Junction (OTJ)", "Murders at Karlov Manor (MKM)", "The Lost Caverns of Ixalan (LCI)", "Wilds of Eldraine (WOE)", "Commander Masters (CMM)", "The Lord of the Rings: Tales of Middle-earth (LTR)", "March of the Machine (MOM)", "Phyrexia: All Will Be One (ONE)", "The Brothers' War (BRO)", "Dominaria United (DMU)", "Commander Legends: Battle for Baldur's Gate (CLB)", "Streets of New Capenna (SNC)", "Kamigawa: Neon Dynasty (NEO)", "Innistrad: Crimson Vow (VOW)", "Innistrad: Midnight Hunt (MID)", "Modern Horizons 2 (MH2)", "Strixhaven: School of Mages (STX)", "Kaldheim (KHM)", "Commander Legends (CMR)", "Zendikar Rising (ZNR)", "Core Set 2021 (M21)", "Ikoria: Lair of Behemoths (IKO)", "Theros Beyond Death (THB)", "Throne of Eldraine (ELD)", "Modern Horizons (MH1)", "War of the Spark (WAR)", "Ravnica Allegiance (RNA)", "Guilds of Ravnica (GRN)", "Core Set 2019 (M19)", "Dominaria (DOM)", "Unstable (UST)", "Ixalan (XLN)", "Hour of Devastation (HOU)", "Amonkhet (AKH)", "Aether Revolt (AER)", "Kaladesh (KLD)", "Eldritch Moon (EMN)", "Shadows over Innistrad (SOI)", "Oath of the Gatewatch (OGW)", "Battle for Zendikar (BFZ)", "Khans of Tarkir (KTK)", "Return to Ravnica (RTR)", "Innistrad (ISD)", "Zendikar (ZEN)"
+            ]
+        };
+
+        let reports = JSON.parse(localStorage.getItem('pt_reports')) || [
+            { id: 1, storeKey: "tesco-bandon", set: "Pokémon: Temporal Forces", status: "Full", note: "3 boxes left on the bottom aisle shelf.", flags: 0, time: "Just now" }
+        ];
+
+        let currentZoom = 1.0;
+        let posX = -150, posY = -150;
+        let isDragging = false;
+        let startX, startY;
+
+        const viewport = document.getElementById('mapViewport');
+        const surface = document.getElementById('mapSurface');
+
+        viewport.addEventListener('mousedown', (e) => {
+            if(e.target.classList.contains('map-pin')) return;
+            isDragging = true;
+            startX = e.clientX - posX;
+            startY = e.clientY - posY;
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            posX = e.clientX - startX;
+            posY = e.clientY - startY;
+            updateSurfaceTransform();
+        });
+        window.addEventListener('mouseup', () => isDragging = false);
+
+        function adjustZoom(amount) {
+            currentZoom = Math.min(Math.max(currentZoom + amount, 0.6), 2.2);
+            updateSurfaceTransform();
+        }
+        function updateSurfaceTransform() {
+            surface.style.transform = `translate(${posX}px, ${posY}px) scale(${currentZoom})`;
+        }
+        updateSurfaceTransform();
+
+        function filterStoreSearch() {
+            const query = document.getElementById('storeSearchInput').value.toLowerCase();
+            const resultsBox = document.getElementById('storeSearchResults');
+            resultsBox.innerHTML = '';
+            
+            if(!query) { resultsBox.classList.add('hidden'); return; }
+            resultsBox.classList.remove('hidden');
+
+            const filtered = localStores.filter(s => s.name.toLowerCase().includes(query));
+            filtered.forEach(store => {
+                const row = document.createElement('div');
+                row.className = "search-item";
+                row.innerText = store.name;
+                row.onclick = () => {
+                    document.getElementById('storeSearchInput').value = store.name;
+                    selectedStoreKey = store.key;
+                    resultsBox.classList.add('hidden');
+                };
+                resultsBox.appendChild(row);
+            });
+
+            if(filtered.length === 0) {
+                const addRow = document.createElement('div');
+                addRow.className = "search-item text-teal-600 font-bold";
+                addRow.innerText = `➕ Add New Location: "${document.getElementById('storeSearchInput').value}"`;
+                addRow.onclick = () => {
+                    const name = document.getElementById('storeSearchInput').value;
+                    const key = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
+                    const newStore = { key: key, name: name, x: 500 + (Math.random()*60 - 30), y: 500 + (Math.random()*60 - 30) };
+                    localStores.push(newStore);
+                    localStorage.setItem('pt_stores', JSON.stringify(localStores));
+                    selectedStoreKey = key;
+                    resultsBox.classList.add('hidden');
+                    renderApp();
+                    inspectStore(key);
+                };
+                addRow.appendChild(addRow);
+            }
+        }
+
+        function onGameSystemChange() {
+            // Wipes the search box if the user alters the database tracking system dropdown
+            document.getElementById('setSearchInput').value = "";
+            selectedSetName = "";
+        }
+
+        // Dynamic Filtering Engine across global game collections
+        function filterGlobalSetSearch() {
+            const selectedSystem = document.getElementById('gameSelect').value;
+            const query = document.getElementById('setSearchInput').value.toLowerCase();
+            const resultsBox = document.getElementById('setSearchResults');
+            resultsBox.innerHTML = '';
+            
+            if(!query) { resultsBox.classList.add('hidden'); return; }
+            resultsBox.classList.remove('hidden');
+
+            // Fetches the array from our localized game key database map
+            const targetSetArray = cachedSetsDatabase[selectedSystem] || [];
+            const filtered = targetSetArray.filter(setName => setName.toLowerCase().includes(query));
+
+            filtered.slice(0, 15).forEach(setName => { // Limit layout index to 15 display items for performance safety
+                const row = document.createElement('div');
+                row.className = "search-item";
+                row.innerText = setName;
+                row.onclick = () => {
+                    document.getElementById('setSearchInput').value = setName;
+                    selectedSetName = setName;
+                    resultsBox.classList.add('hidden');
+                };
+                resultsBox.appendChild(row);
+            });
+
+            // Fallback: If a user searches for an obscure set, allow them to input it manually
+            if(filtered.length === 0) {
+                const manualRow = document.createElement('div');
+                manualRow.className = "search-item text-slate-500 italic";
+                manualRow.innerText = `Use custom input: "${document.getElementById('setSearchInput').value}"`;
+                manualRow.onclick = () => {
+                    selectedSetName = document.getElementById('setSearchInput').value;
+                    resultsBox.classList.add('hidden');
+                };
+                resultsBox.appendChild(manualRow);
+            }
+        }
+
         function inspectStore(key) {
-            const store = storeDetails[key];
+            const store = localStores.find(s => s.key === key);
             const panel = document.getElementById('inspectorPanel');
             const match = reports.filter(r => r.storeKey === key).pop();
             
             if (match) {
-                const dots = { 'Full': '🟢', 'Low': '🟡', 'Out': '🔴' };
+                const dots = { 'Full': '🟢', 'Low': '🟡', 'Out': '🔴', 'Unknown': '⚪' };
                 panel.innerHTML = `
-                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                    <div class="flex justify-between items-start">
                         <div>
-                            <strong style="color: #2dd4bf; font-size: 14px;">${store.name}</strong>
-                            <div style="font-size: 11px; color: #94a3b8; margin-top: 2px;">${store.location}</div>
+                            <strong class="text-teal-400 text-base">${store.name}</strong>
+                            <p class="text-xs text-slate-400 mt-1">📦 Last Seen Set: ${match.set}</p>
                         </div>
-                        <span style="font-weight: bold; font-size: 13px;">${dots[match.status]} ${match.status}</span>
+                        <div class="text-right">
+                            <span class="font-bold text-sm">${dots[match.status]} ${match.status}</span>
+                            <button onclick="flagReport(${match.id}, '${key}')" class="block bg-red-900/40 text-red-300 border border-red-800 text-[10px] px-2 py-0.5 rounded mt-2 font-bold hover:bg-red-800 hover:text-white transition-colors">⚠️ Flag False Data (${match.flags || 0}/5)</button>
+                        </div>
                     </div>
-                    <div style="margin-top: 8px; border-top: 1px solid #334155; pt: 8px; display: flex; justify-content: space-between; font-size: 12px; color: #cbd5e1; padding-top: 6px;">
-                        <span>📦 Set: ${match.set}</span>
-                        <span style="color: #64748b;">Logged: ${match.time}</span>
-                    </div>
+                    ${match.note ? `<div class="mt-2.5 bg-slate-950 p-2 rounded text-xs border border-slate-800 text-slate-300 font-mono">📝 Note: ${match.note}</div>` : ''}
                 `;
             } else {
-                panel.innerHTML = `<strong style="color: #f1f5f9;">${store.name}</strong><br><span style="color: #64748b; font-size: 12px;">⚠️ No local shelf reports logged yet.</span>`;
+                panel.innerHTML = `<strong class="text-slate-200 text-base">${store.name}</strong><br><span class="text-slate-500 text-xs">⚠️ No active stock reports logged for this position yet.</span>`;
+            }
+        }
+
+        function flagReport(id, storeKey) {
+            const report = reports.find(r => r.id === id);
+            if(report) {
+                report.flags = (report.flags || 0) + 1;
+                if(report.flags >= 5) {
+                    report.status = "Unknown";
+                    report.note = "System Reset: Previous report cleared following community flagging threshold validation.";
+                }
+                localStorage.setItem('pt_reports', JSON.stringify(reports));
+                renderApp();
+                inspectStore(storeKey);
             }
         }
 
         function renderApp() {
+            const pinsLayer = document.getElementById('pinsLayer');
+            if(pinsLayer) pinsLayer.innerHTML = '';
+            
             const feed = document.getElementById('feedContainer');
-            if(!feed) return;
-            feed.innerHTML = '';
+            if(feed) feed.innerHTML = '';
 
             const activeStoreStatus = {};
 
             reports.forEach(report => {
                 activeStoreStatus[report.storeKey] = report;
 
-                const dotMap = { 'Full': '🟢', 'Low': '🟡', 'Out': '🔴' };
+                const colorMap = { 'Full': 'badge-Full', 'Low': 'badge-Low', 'Out': 'badge-Out', 'Unknown': 'bg-slate-100 text-slate-800' };
+                const dotMap = { 'Full': '🟢', 'Low': '🟡', 'Out': '🔴', 'Unknown': '⚪' };
+                const storeObj = localStores.find(s => s.key === report.storeKey);
                 
                 const card = document.createElement('div');
                 card.className = "feed-card";
                 card.innerHTML = `
-                    <div>
-                        <strong style="font-size: 14px; color: #1e293b;">${storeDetails[report.storeKey].name}</strong>
-                        <div style="font-size: 12px; color: #64748b; margin-top: 2px;">${report.set}</div>
+                    <div style="flex:1; padding-right:12px;">
+                        <strong class="text-slate-900 text-sm">${storeObj ? storeObj.name : 'Added Store Location'}</strong>
+                        <div class="text-xs text-slate-500 font-medium mt-0.5">${report.set}</div>
+                        ${report.note ? `<div class="text-[11px] text-slate-600 bg-slate-50 border p-1.5 rounded mt-1.5 font-mono">${report.note}</div>` : ''}
                     </div>
-                    <div style="text-align: right;">
-                        <span class="badge badge-${report.status}">${dotMap[report.status]} ${report.status}</span>
-                        <div class="time-text">Updated: ${report.time}</div>
+                    <div class="text-right flex flex-col items-end justify-between">
+                        <span class="badge ${colorMap[report.status]}">${dotMap[report.status]} ${report.status}</span>
+                        <div class="time-text mt-2">Time: ${report.time}</div>
                     </div>
                 `;
-                feed.prepend(card);
+                if(feed) feed.prepend(card);
             });
 
-            // Color coordinate map node points natively based on status state rules
-            Object.keys(storeDetails).forEach(key => {
-                const pin = document.getElementById(`pin-${key}`);
-                if (pin) {
-                    const currentReport = activeStoreStatus[key];
-                    pin.className = `map-pin color-${currentReport ? currentReport.status : 'None'}`;
-                }
+            localStores.forEach(store => {
+                const currentReport = activeStoreStatus[store.key];
+                const status = currentReport ? currentReport.status : 'Unknown';
+                
+                const pin = document.createElement('div');
+                pin.className = `map-pin color-${status}`;
+                pin.style.left = `${store.x}px`;
+                pin.style.top = `${store.y}px`;
+                pin.onclick = () => inspectStore(store.key);
+                
+                const label = document.createElement('span');
+                label.className = "pin-label";
+                label.innerText = store.name;
+                
+                pin.appendChild(label);
+                if(pinsLayer) pinsLayer.appendChild(pin);
             });
         }
 
         function submitReport() {
-            const storeKey = document.getElementById('storeSelect').value;
-            const set = document.getElementById('setSelect').value;
+            const nameInput = document.getElementById('storeSearchInput').value;
+            const setInput = document.getElementById('setSearchInput').value;
             const status = document.getElementById('statusSelect').value;
-            
+            const note = document.getElementById('reportNote').value;
+
+            if(!selectedStoreKey || !setInput) {
+                alert("Input Error: Ensure you search and select a specific Store and target Expansion Set item from the matching panels before broadcasting data.");
+                return;
+            }
+
             const now = new Date();
             const timeString = now.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' });
 
             const newReport = {
                 id: Date.now(),
-                storeKey: storeKey,
-                set: set,
+                storeKey: selectedStoreKey,
+                set: setInput,
                 status: status,
+                note: note,
+                flags: 0,
                 time: timeString
             };
 
             reports.push(newReport);
-            localStorage.setItem('tcg_reports', JSON.stringify(reports));
+            localStorage.setItem('pt_reports', JSON.stringify(reports));
+            
+            document.getElementById('storeSearchInput').value = '';
+            document.getElementById('setSearchInput').value = '';
+            document.getElementById('reportNote').value = '';
+            selectedStoreKey = null;
+            selectedSetName = "";
+
             renderApp();
-            inspectStore(storeKey);
         }
 
         renderApp();
