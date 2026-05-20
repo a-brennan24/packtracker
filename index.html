@@ -213,7 +213,7 @@
                 row.onclick = () => {
                     document.getElementById('storeSearchInput').value = store.name;
                     selectedStoreKey = store.key;
-                    resultsBox.classList.add('hidden');
+                    resultsBox.classList.add('hidden'); // PATCH: Dropdown closes immediately upon item tap
                 };
                 resultsBox.appendChild(row);
             });
@@ -226,13 +226,12 @@
                     const name = document.getElementById('storeSearchInput').value;
                     const key = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
                     
-                    // Drop the pin coordinates relative to the user's active viewport alignment view center
                     const newStore = { key: key, name: name, x: 500 + (Math.random()*80 - 40), y: 500 + (Math.random()*80 - 40) };
                     localStores.push(newStore);
                     localStorage.setItem('pt_stores', JSON.stringify(localStores));
                     
                     selectedStoreKey = key;
-                    resultsBox.classList.add('hidden');
+                    resultsBox.classList.add('hidden'); // PATCH: Closes if a new store node is spun up
                     renderApp();
                     inspectStore(key);
                 };
@@ -264,7 +263,7 @@
                 row.onclick = () => {
                     document.getElementById('setSearchInput').value = setName;
                     selectedSetName = setName;
-                    resultsBox.classList.add('hidden');
+                    resultsBox.classList.add('hidden'); // PATCH: Expansion menu snaps shut on tap
                 };
                 resultsBox.appendChild(row);
             });
@@ -275,7 +274,7 @@
                 manualRow.innerText = `Use custom input: "${document.getElementById('setSearchInput').value}"`;
                 manualRow.onclick = () => {
                     selectedSetName = document.getElementById('setSearchInput').value;
-                    resultsBox.classList.add('hidden');
+                    resultsBox.classList.add('hidden'); // PATCH: Manual typing choice closes lookup pane
                 };
                 resultsBox.appendChild(manualRow);
             }
