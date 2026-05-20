@@ -86,7 +86,7 @@
             <!-- Store Autocomplete Selector Bar -->
             <div class="relative">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">1. Search or Add Store</label>
-                <input type="text" id="storeSearchInput" oninput="filterStoreSearch()" placeholder="Type to filter list or type a name to create new..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
+                <input type="text" id="storeSearchInput" oninput="filterStoreSearch()" onblur="hideStoreResultsDelayed()" placeholder="Type to filter list or type a name to create new..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
                 <div id="storeSearchResults" class="search-results-box hidden"></div>
             </div>
 
@@ -116,7 +116,7 @@
             <!-- Expansion List Search Filter Bar -->
             <div class="relative">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">4. Search Expansion Set</label>
-                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" placeholder="Type set title (e.g. Mega Evolution, Shrouded Fable)..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
+                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" onblur="hideSetResultsDelayed()" placeholder="Type set title (e.g. Mega Evolution, Shrouded Fable)..." class="w-full bg-slate-50 border border-slate-200 rounded-lg p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
                 <div id="setSearchResults" class="search-results-box hidden"></div>
             </div>
 
@@ -210,10 +210,10 @@
                 const row = document.createElement('div');
                 row.className = "search-item";
                 row.innerText = store.name;
-                row.onclick = () => {
+                row.onmousedown = () => { // PATCH: Using onmousedown captures the layout selection before input focus breaks
                     document.getElementById('storeSearchInput').value = store.name;
                     selectedStoreKey = store.key;
-                    resultsBox.classList.add('hidden'); // PATCH: Dropdown closes immediately upon item tap
+                    resultsBox.classList.add('hidden');
                 };
                 resultsBox.appendChild(row);
             });
@@ -222,7 +222,7 @@
                 const addRow = document.createElement('div');
                 addRow.className = "search-item text-teal-600 font-bold";
                 addRow.innerText = `➕ Add New Location: "${document.getElementById('storeSearchInput').value}"`;
-                addRow.onclick = () => {
+                addRow.onmousedown = () => {
                     const name = document.getElementById('storeSearchInput').value;
                     const key = name.toLowerCase().replace(/[^a-z0-9]/g, '-');
                     
@@ -231,12 +231,19 @@
                     localStorage.setItem('pt_stores', JSON.stringify(localStores));
                     
                     selectedStoreKey = key;
-                    resultsBox.classList.add('hidden'); // PATCH: Closes if a new store node is spun up
+                    resultsBox.classList.add('hidden');
                     renderApp();
                     inspectStore(key);
                 };
                 resultsBox.appendChild(addRow);
             }
+        }
+
+        // PATCH: Delayed close ensures data registers on slow phone tap inputs before hiding
+        function hideStoreResultsDelayed() {
+            setTimeout(() => {
+                document.getElementById('storeSearchResults').classList.add('hidden');
+            }, 200);
         }
 
         function onGameSystemChange() {
@@ -260,10 +267,10 @@
                 const row = document.createElement('div');
                 row.className = "search-item";
                 row.innerText = setName;
-                row.onclick = () => {
+                row.onmousedown = () => { // PATCH: Swapped to onmousedown execution track
                     document.getElementById('setSearchInput').value = setName;
                     selectedSetName = setName;
-                    resultsBox.classList.add('hidden'); // PATCH: Expansion menu snaps shut on tap
+                    resultsBox.classList.add('hidden');
                 };
                 resultsBox.appendChild(row);
             });
@@ -272,12 +279,19 @@
                 const manualRow = document.createElement('div');
                 manualRow.className = "search-item text-slate-500 italic";
                 manualRow.innerText = `Use custom input: "${document.getElementById('setSearchInput').value}"`;
-                manualRow.onclick = () => {
+                manualRow.onmousedown = () => {
                     selectedSetName = document.getElementById('setSearchInput').value;
-                    resultsBox.classList.add('hidden'); // PATCH: Manual typing choice closes lookup pane
+                    resultsBox.classList.add('hidden');
                 };
                 resultsBox.appendChild(manualRow);
             }
+        }
+
+        // PATCH: Smooth timeout for the expansion selector container box
+        function hideSetResultsDelayed() {
+            setTimeout(() => {
+                document.getElementById('setSearchResults').classList.add('hidden');
+            }, 200);
         }
 
         function inspectStore(key) {
