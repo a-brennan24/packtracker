@@ -131,10 +131,11 @@
         // INITIALIZE ALL-IRELAND VIEW: Centered perfectly over Athlone to show the whole country seamlessly
         const map = L.map('map').setView([53.42, -7.92], 7);
         
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        L.tileLayer('https://openstreetmap.org{z}/{x}/{y}.png', {
             maxZoom: 19,
-            attribution: '© OpenStreetMap'
+            attribution: '© OpenStreetMap contributors'
         }).addTo(map);
+
 
         let markerGroup = L.layerGroup().addTo(map);
 
