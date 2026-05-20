@@ -4,18 +4,20 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PackTracker Ireland</title>
-    <!-- Tailwind CSS for clean theme styling -->
+    <!-- Tailwind CSS for mobile-optimized UI styling -->
     <script src="https://tailwindcss.com"></script>
     <!-- Full Leaflet Map packages -->
     <link rel="stylesheet" href="https://unpkg.com" />
     <script src="https://unpkg.com"></script>
     <style>
-        #map { height: 380px; width: 100%; z-index: 1; background: #cbd5e1; }
+        #map { height: 380px; width: 100%; z-index: 1; }
         .breeze-bg { background-color: #f0fdfa; }
+        .leaflet-container { background-color: #cbd5e1 !important; }
     </style>
 </head>
 <body class="breeze-bg font-sans min-h-screen text-slate-800 pb-20">
 
+    <!-- App Navbar Layer -->
     <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
@@ -25,7 +27,7 @@
 
     <main class="max-w-md mx-auto p-4 space-y-4">
         
-        <!-- Live Map Box -->
+        <!-- Live Map Interface Box -->
         <div class="bg-white rounded-xl shadow-sm border border-teal-100 overflow-hidden">
             <div class="p-3 bg-teal-50 border-b border-teal-100 flex justify-between items-center">
                 <h2 class="font-semibold text-teal-900">📍 Local Stock Map</h2>
@@ -34,7 +36,7 @@
             <div id="map"></div>
         </div>
 
-        <!-- Submit Form Section -->
+        <!-- Submission Input Fields -->
         <div class="bg-white p-4 rounded-xl shadow-sm border border-teal-100 space-y-3">
             <h2 class="font-bold text-lg text-teal-900 flex items-center gap-2">📝 Log a Shelf Report</h2>
             
@@ -72,7 +74,7 @@
             </button>
         </div>
 
-        <!-- Text Dashboard Feed -->
+        <!-- Real-Time Activity Log Feed -->
         <div class="space-y-2">
             <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider px-1">Live Feed Dashboard</h3>
             <div id="feedContainer" class="space-y-2"></div>
@@ -88,9 +90,11 @@
             "comic-vault-cork": { name: "The Comic Vault Cork", lat: 51.8975, lng: -8.4718 }
         };
 
+        // Initialize Map and bind to OpenStreetMap tile layers
         const map = L.map('map').setView([51.8200, -8.6000], 10);
         
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 19,
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
@@ -164,6 +168,9 @@
                     fillOpacity: 0.9
                 }).addTo(markerGroup).bindPopup(popupContent);
             });
+
+            // CRITICAL: Forces map engine to re-verify container dimensions, clearing the grey screen error block
+            setTimeout(() => { map.invalidateSize(); }, 100);
         }
 
         function submitReport() {
