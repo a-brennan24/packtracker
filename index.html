@@ -4,7 +4,427 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PackTracker Ireland</title>
-    <!-- Tailwind CSS for modern mobile layout styling -->
+    <!-- Tailwind CSS for modern mobile layout<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PackTracker Ireland</title>
+    <!-- Tailwind CSS for custom theme styling -->
+    <script src="https://tailwindcss.com"></script>
+    <style>
+        body { background-color: #0f172a; font-family: system-ui, -apple-system, sans-serif; }
+        .dark-bg { background-color: #0f172a; }
+        .feed-card { background: #1e293b; padding: 16px; border-radius: 12px; border: 1px solid #334155; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.2); display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; color: #f8fafc; }
+        .badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; border: 1px solid; white-space: nowrap; }
+        .badge-Full { background: #064e3b; color: #34d399; border-color: #047857; }
+        .badge-Low { background: #78350f; color: #fbbf24; border-color: #b45309; }
+        .badge-Out { background: #7f1d1d; color: #f87171; border-color: #b91c1c; }
+        .badge-Unknown { background: #334155; color: #cbd5e1; border-color: #475569; }
+        .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+        .modal-overlay { transition: opacity 0.2s ease, visibility 0.2s ease; }
+    </style>
+</head>
+<body class="dark-bg text-slate-200 pb-24">
+
+    <!-- Premium Dark Navbar Header -->
+    <header class="bg-slate-900 text-white p-4 shadow-xl sticky top-0 z-50 border-b border-slate-800">
+        <div class="max-w-md mx-auto flex justify-between items-center">
+            <h1 class="text-xl font-bold tracking-wide text-teal-400">⚡ PackTracker Ireland</h1>
+            <!-- Manual Onboarding Button Trigger -->
+            <button onclick="toggleManualModal(true)" class="bg-slate-800 hover:bg-slate-700 text-teal-400 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-slate-700 shadow-sm focus:outline-none active:scale-95">ℹ️</button>
+        </div>
+    </header>
+
+    <!-- Guide Manual Pop-up Modal Container -->
+    <div id="manualModal" style="display: none;" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-overlay" onclick="toggleManualModal(false)">
+        <div class="bg-slate-900 rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-800 max-h-[85vh] overflow-y-auto space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-teal-400 text-lg flex items-center gap-1.5">📖 PackTracker Manual</h3>
+                <button onclick="toggleManualModal(false)" class="text-slate-500 hover:text-slate-400 font-bold text-xl p-1">✕</button>
+            </div>
+            
+            <div class="space-y-3.5 text-sm text-slate-400 leading-relaxed">
+                <div>
+                    <strong class="text-teal-400 block mb-0.5">🔍 1. Global Search Engine</strong>
+                    <p>Type any county (e.g., "Cork"), specific store title, or TCG expansion set name into the search bar. The engine filters all logs instantly to isolate target shelves.</p>
+                </div>
+                <div>
+                    <strong class="text-teal-400 block mb-0.5">🏪 2. Add New Retail Stores</strong>
+                    <p>If your local store is missing from the selector index list, input its name into Section 2, choose its official Irish county, and tap save to link it globally.</p>
+                </div>
+                <div>
+                    <strong class="text-teal-400 block mb-0.5">📝 3. Log a Shelf Report</strong>
+                    <p>Select your saved store, toggle the card game network, pick the availability level, and broadcast your update. Use custom notes for shelf details.</p>
+                </div>
+                <div>
+                    <strong class="text-teal-400 block mb-0.5">⏳ 4. 48-Hour Auto-Expiry Filter</strong>
+                    <p>TCG shelves change incredibly fast. To keep files accurate, all community updates automatically age out and disappear from the log feed after exactly 48 hours.</p>
+                </div>
+                <div>
+                    <strong class="text-teal-400 block mb-0.5">⚠️ 5. Community Moderation</strong>
+                    <p>Spot an inaccurate entry or troll? Tap the Flag button next to the post log card. Once any stock report hits 5 flags, the algorithm forces an automatic status reset.</p>
+                </div>
+            </div>
+
+            <button onclick="toggleManualModal(false)" class="w-full bg-teal-500 hover:bg-teal-600 text-slate-950 font-bold py-2.5 rounded-xl shadow-md transition-all active:scale-[0.98] text-sm mt-2">
+                Got it, Let's Track!
+            </button>
+        </div>
+    </div>
+
+    <main class="max-w-md mx-auto p-4 space-y-5">
+        
+        <!-- SECTION 1: GLOBAL SEARCH ENGINE (STORES, SETS, OR COUNTIES) -->
+        <div class="bg-slate-900 p-5 rounded-2xl shadow-lg border border-slate-800 space-y-3">
+            <h2 class="font-bold text-teal-400 text-lg flex items-center gap-1.5">1. Global Search Engine</h2>
+            <p class="text-xs text-slate-400">Filter live logs by typing a store name, set title, or full **County** (e.g., Cork, Dublin).</p>
+            
+            <div class="relative">
+                <input type="text" id="globalSearchInput" oninput="runGlobalSearch()" placeholder="Search store, set, or county..." class="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-xl p-3 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
+            </div>
+            
+            <div id="searchResultsContainer" class="space-y-2 pt-1"></div>
+        </div>
+
+        <!-- SECTION 2: DEDICATED STORE REGISTRATION BOX -->
+        <div class="bg-slate-900 p-5 rounded-2xl shadow-lg border border-slate-800 space-y-4">
+            <h2 class="font-bold text-teal-400 text-lg flex items-center gap-1.5">2. Add a New Retail Store</h2>
+            <p class="text-xs text-slate-400">Store missing from the dropdown tracker below? Add its details here instantly.</p>
+            
+            <div class="grid grid-cols-3 gap-2">
+                <div class="col-span-2">
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">New Store Title</label>
+                    <input type="text" id="newStoreNameInput" placeholder="e.g. Tesco Superstore Bandon..." class="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">County</label>
+                    <select id="newStoreCountySelect" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                        <option value="Antrim">Antrim</option><option value="Armagh">Armagh</option><option value="Carlow">Carlow</option><option value="Cavan">Cavan</option><option value="Clare">Clare</option><option value="Cork" selected>Cork</option><option value="Derry">Derry</option><option value="Donegal">Donegal</option><option value="Down">Down</option><option value="Dublin">Dublin</option><option value="Fermanagh">Fermanagh</option><option value="Galway">Galway</option><option value="Kerry">Kerry</option><option value="Kildare">Kildare</option><option value="Kilkenny">Kilkenny</option><option value="Laois">Laois</option><option value="Leitrim">Leitrim</option><option value="Limerick">Limerick</option><option value="Longford">Longford</option><option value="Louth">Louth</option><option value="Mayo">Mayo</option><option value="Meath">Meath</option><option value="Monaghan">Monaghan</option><option value="Offaly">Offaly</option><option value="Roscommon">Roscommon</option><option value="Sligo">Sligo</option><option value="Tipperary">Tipperary</option><option value="Tyrone">Tyrone</option><option value="Waterford">Waterford</option><option value="Westmeath">Westmeath</option><option value="Wexford">Wexford</option><option value="Wicklow">Wicklow</option>
+                    </select>
+                </div>
+            </div>
+            
+            <button onclick="createNewStoreNatively()" class="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold py-2.5 rounded-xl transition-all shadow-md text-sm active:scale-[0.99]">
+                ➕ Save New Location to Database
+            </button>
+        </div>
+
+        <!-- SECTION 3: LOG LOGS & BROADCAST NEW SHELF FILE UPDATES -->
+        <div class="bg-slate-900 p-5 rounded-2xl shadow-lg border border-slate-800 space-y-4">
+            <h2 class="font-bold text-teal-400 text-lg flex items-center gap-1.5">3. Log a Shelf Report</h2>
+            
+            <!-- Store Selection Dropdown -->
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Tracked Store Location</label>
+                <select id="storeSelect" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                    <!-- Loaded dynamically via JavaScript -->
+                </select>
+            </div>
+
+            <!-- TCG System Dropdowns -->
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Game System</label>
+                    <select id="gameSelect" onchange="onGameSystemChange()" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                        <option value="pokemon-en">Pokémon (English)</option>
+                        <option value="pokemon-jp">Pokémon (Japanese)</option>
+                        <option value="lorcana">Disney Lorcana</option>
+                        <option value="yugioh">Yu-Gi-Oh!</option>
+                        <option value="mtg">Magic: The Gathering</option>
+                        <option value="op">One Piece</option>
+                    </select>
+                </div>
+
+                <div>
+                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Stock Status</label>
+                    <select id="statusSelect" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-xl p-2.5 font-bold focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                        <option value="Full" class="text-green-400">🟢 Full Stock</option>
+                        <option value="Low" class="text-yellow-400">🟡 Low Stock</option>
+                        <option value="Out" class="text-red-400">🔴 Out of Stock</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- TCG Expansion Dropdown -->
+            <div>
+                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select TCG Expansion Set</label>
+                <select id="setSelect" class="w-full bg-slate-800 border border-slate-700 text-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                    <!-- Options load smoothly depending on dropdown choice -->
+                </select>
+            </div>
+
+            <!-- Custom text comment notes box -->
+            <div>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Custom Note (Optional)</label>
+                <input type="text" id="reportNote" placeholder="e.g. Limit 2 boxes per person, items located inside checkout lane..." class="w-full bg-slate-800 border border-slate-700 text-slate-100 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+            </div>
+
+            <button onclick="submitReport()" class="w-full bg-teal-500 hover:bg-teal-400 text-slate-950 font-bold py-3 rounded-xl transition-all shadow-md active:scale-[0.98]">
+                Broadcast Live Update
+            </button>
+        </div>
+
+        <!-- SECTION 4: LIVE RECENT FEED UPDATES TRACK TIMELINE TIMESTAMPS -->
+        <div class="space-y-2.5">
+            <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider px-1">4. Live Feed Updates</h3>
+            <div id="feedContainer" class="space-y-2"></div>
+        </div>
+
+    </main>
+
+    <script>
+        const masterDefaultStores = [
+            { key: "smyths-cork", name: "Smyths Toys Kinsale Rd", county: "Cork" },
+            { key: "tesco-midleton", name: "Tesco Superstore Midleton", county: "Cork" },
+            { key: "geek-retreat-dublin", name: "Geek Retreat", county: "Dublin" }
+        ];
+
+        let localStores = JSON.parse(localStorage.getItem('pt_stores')) || masterDefaultStores;
+
+        localStores.forEach(store => {
+            if (!store.county || store.county === "undefined") {
+                const match = masterDefaultStores.find(m => m.key === store.key);
+                store.county = match ? match.county : "Cork"; 
+            }
+        });
+        localStorage.setItem('pt_stores', JSON.stringify(localStores));
+
+        let cachedSetsDatabase = {
+            "pokemon-en": [   
+                "Mega Evolution: Chaos Rising", "Mega Evolution: Perfect Order", "Mega Evolution: Ascended Heroes", "Mega Evolution: Phantasmal Flames", "Mega Evolution: Base Set", 
+                "Scarlet & Violet: White Flare", "Scarlet & Violet: Black Violet", "Scarlet & Violet: Destined Rivals", "Scarlet & Violet: Journey Together", "Scarlet & Violet: Prismatic Evolutions", "Scarlet & Violet: Surging Sparks", "Scarlet & Violet: Stellar Crown", "Scarlet & Violet: Shrouded Fable", "Scarlet & Violet: Twilight Masquerade", "Scarlet & Violet: Temporal Forces", "Scarlet & Violet: Paldean Fates", "Scarlet & Violet: Paradox Rift", "Scarlet & Violet: 151 Collection", "Scarlet & Violet: Obsidian Flames", "Scarlet & Violet: Paldea Evolved", "Scarlet & Violet: Base Set"
+            ],
+            "pokemon-jp": ["Mega Awakening (SV9)", "Lumiose Legends (SV9a)", "Terastal Festival (SV8a)", "Pokémon Card 151 (SV2a)"],
+            "lorcana": ["Azurite Sea (Chapter 6)", "Shimmering Skies (Chapter 5)", "Into the Inklands (Chapter 3)"],
+            "yugioh": ["The Infinite Forbidden", "Legacy of Destruction", "Phantom Nightmare"],
+            "mtg": ["Foundations (FDN)", "Duskmourn: House of Horror (DSK)", "Bloomburrow (BLB)"],
+            "op": [
+                "OP-09: New Emperor", "OP-08: Two Legends", "OP-07: 500 Years into the Future", "OP-06: Wings of the Captain", "OP-05: Awakening of the New Era", "OP-04: Kingdoms of Intrigue", "OP-03: Pillars of Strength", "OP-02: Paramount War", "OP-01: Romance Dawn", "PRB-01: Premium Booster"
+            ]
+        };
+
+        let reports = JSON.parse(localStorage.getItem('tcg_reports')) || [
+            { id: 1, storeKey: "smyths-cork", set: "Pokémon: Mega Evolution Perfect Order", status: "Low", note: "Hanger racks filled behind customer service.", flags: 0, timestamp: Date.now(), time: "Just now" }
+        ];
+
+        function toggleManualModal(show) {
+            const modal = document.getElementById('manualModal');
+            if (show) {
+                modal.style.display = 'flex'; 
+                setTimeout(() => modal.classList.remove('opacity-0'), 10);
+            } else {
+                modal.classList.add('opacity-0');
+                setTimeout(() => { modal.style.display = 'none'; }, 200); 
+            }
+        }
+
+        function filterExpiredReports() {
+            const fortyEightHoursInMs = 48 * 60 * 60 * 1000;
+            const now = Date.now();
+            
+            const unexpiredReports = reports.filter(report => {
+                const reportTime = report.timestamp || Date.now();
+                return (now - reportTime) < fortyEightHoursInMs;
+            });
+
+            if (unexpiredReports.length !== reports.length) {
+                reports = unexpiredReports;
+                localStorage.setItem('tcg_reports', JSON.stringify(reports));
+            }
+        }
+
+        function runGlobalSearch() {
+            filterExpiredReports(); 
+            const query = document.getElementById('globalSearchInput').value.toLowerCase().trim();
+            const container = document.getElementById('searchResultsContainer');
+            container.innerHTML = '';
+
+            if(!query) return;
+
+            const filteredReports = reports.filter(r => {
+                const storeObj = localStores.find(s => s.key === r.storeKey);
+                const storeName = storeObj ? storeObj.name.toLowerCase() : '';
+                const countyName = storeObj ? storeObj.county.toLowerCase() : '';
+                const setName = r.set.toLowerCase();
+                
+                return storeName.includes(query) || setName.includes(query) || countyName === query || countyName.includes(query);
+            });
+
+            if(filteredReports.length === 0) {
+                container.innerHTML = `<div class="text-xs text-slate-500 italic p-2 bg-slate-800 rounded-xl border border-slate-700">No active stock logs matched that query. Try logging an update below!</div>`;
+                return;
+            }
+
+            filteredReports.forEach(report => {
+                const storeObj = localStores.find(s => s.key === report.storeKey);
+                const colorMap = { 'Full': 'badge-Full', 'Low': 'badge-Low', 'Out': 'badge-Out', 'Unknown': 'badge-Unknown' };
+                const dotMap = { 'Full': '🟢', 'Low': '🟡', 'Out': '🔴', 'Unknown': '⚪' };
+
+                const card = document.createElement('div');
+                card.className = "feed-card border-slate-700 bg-slate-800/40";
+                card.innerHTML = `
+                    <div style="flex:1; padding-right:12px;">
+                        <div class="flex items-center gap-1.5">
+                            <strong class="text-teal-400 text-sm">${storeObj ? storeObj.name : 'Store Node'}</strong>
+                            <span class="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded border border-slate-700 font-bold uppercase font-mono">${storeObj ? storeObj.county : 'IE'}</span>
+                        </div>
+                        <div class="text-xs text-slate-300 font-medium mt-1">${report.set}</div>
+                        ${report.note ? `<div class="text-[11px] text-slate-400 bg-slate-950 border border-slate-800 p-1.5 rounded mt-1.5 font-mono">Note: ${report.note}</div>` : ''}
+                    </div>
+                    <div class="text-right flex flex-col items-end">
+                        <span class="badge ${colorMap[report.status]}">${dotMap[report.status]} ${report.status}</span>
+                        <div class="time-text mt-2">Logged: ${report.time}</div>
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        function createNewStoreNatively() {
+            const storeName = document.getElementById('newStoreNameInput').value.trim();
+            const countySelected = document.getElementById('newStoreCountySelect').value;
+
+            if(!storeName) {
+                alert("Input Error: Please fill inside the store title text field before attempting to save.");
+                return;
+            }
+
+            let exists = localStores.find(s => s.name.toLowerCase() === storeName.toLowerCase());
+            if(exists) {
+                alert(`Platform Warning: A retail store named "${storeName}" is already registered in the list tracker dashboard.`);
+                return;
+            }
+
+            const newKey = storeName.toLowerCase().replace(/[^a-z0-9]/g, '-');
+            const storeObject = { key: newKey, name: storeName, county: countySelected };
+            
+            localStores.push(storeObject);
+            localStorage.setItem('pt_stores', JSON.stringify(localStores));
+            
+            document.getElementById('newStoreNameInput').value = '';
+            
+            renderApp();
+        }
+
+        function populateStoreDropdown() {
+            const select = document.getElementById('storeSelect');
+            select.innerHTML = '';
+            
+            localStores.forEach(store => {
+                const opt = document.createElement('option');
+                opt.value = store.key;
+                opt.innerText = `${store.name} (${store.county})`;
+                select.appendChild(opt);
+            });
+        }
+
+        function onGameSystemChange() {
+            populateSetDropdown();
+        }
+
+        function populateSetDropdown() {
+            const selectedSystem = document.getElementById('gameSelect').value;
+            const select = document.getElementById('setSelect');
+            select.innerHTML = '';
+
+            const targetSetArray = cachedSetsDatabase[selectedSystem] || [];
+            targetSetArray.forEach(setName => {
+                const opt = document.createElement('option');
+                opt.value = setName;
+                opt.innerText = setName;
+                select.appendChild(opt);
+            });
+        }
+
+        function flagReport(id) {
+            const report = reports.find(r => r.id === id);
+            if(report) {
+                report.flags = (report.flags || 0) + 1;
+                if(report.flags >= 5) {
+                    report.status = "Unknown";
+                    report.note = "System Reset: Previous report cleared following community flagging threshold validation loops.";
+                }
+                localStorage.setItem('tcg_reports', JSON.stringify(reports));
+                renderApp();
+                if(document.getElementById('globalSearchInput').value) runGlobalSearch();
+            }
+        }
+
+        function renderApp() {
+            filterExpiredReports(); 
+            const feed = document.getElementById('feedContainer');
+            if(!feed) return;
+            feed.innerHTML = '';
+
+            reports.forEach(report => {
+                const colorMap = { 'Full': 'badge-Full', 'Low': 'badge-Low', 'Out': 'badge-Out', 'Unknown': 'badge-Unknown' };
+                const dotMap = { 'Full': '🟢', 'Low': '🟡', 'Out': '🔴', 'Unknown': '⚪' };
+                const storeObj = localStores.find(s => s.key === report.storeKey);
+                
+                const card = document.createElement('div');
+                card.className = "feed-card";
+                card.innerHTML = `
+                    <div style="flex:1; padding-right:12px;">
+                        <div class="flex items-center gap-1.5">
+                            <strong class="text-slate-200 text-sm">${storeObj ? storeObj.name : 'Added Location Node'}</strong>
+                            <span class="text-[9px] bg-slate-800 text-slate-400 px-1.5 py-0.2 rounded border border-slate-700 font-bold uppercase">${storeObj ? storeObj.county : 'IE'}</span>
+                        </div>
+                        <div class="text-xs text-slate-400 font-medium mt-1">${report.set}</div>
+                        ${report.note ? `<div class="text-[11px] text-slate-400 bg-slate-950 border border-slate-800 p-1.5 rounded mt-1.5 font-mono">${report.note}</div>` : ''}
+                    </div>
+                    <div class="text-right flex flex-col items-end justify-between">
+                        <span class="badge ${colorMap[report.status]}">${dotMap[report.status]} ${report.status}</span>
+                        <button onclick="flagReport(${report.id})" class="text-[10px] text-red-400 border border-red-900/60 bg-red-950/40 font-bold px-1.5 py-0.5 rounded mt-2.5 active:scale-95 transition-transform">⚠️ Flag (${report.flags || 0}/5)</button>
+                        <div class="time-text mt-2">Time: ${report.time}</div>
+                    </div>
+                `;
+                feed.prepend(card);
+            });
+
+            populateStoreDropdown();
+            populateSetDropdown();
+        }
+
+        function submitReport() {
+            const storeKeySelected = document.getElementById('storeSelect').value;
+            const setInputName = document.getElementById('setSelect').value;
+            const status = document.getElementById('statusSelect').value;
+            const note = document.getElementById('reportNote').value;
+
+            if(!storeKeySelected || !setInputName) {
+                alert("Input Error: Choose a registered Store title and select a target Expansion Set before logging your update ticket.");
+                return;
+            }
+
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('en-IE', { hour: '2-digit', minute: '2-digit' });
+
+            const newReport = {
+                id: Date.now(),
+                storeKey: storeKeySelected,
+                set: setInputName,
+                status: status,
+                note: note,
+                flags: 0,
+                timestamp: Date.now(), 
+                time: timeString
+            };
+
+            reports.push(newReport);
+            localStorage.setItem('tcg_reports', JSON.stringify(reports));
+            
+            document.getElementById('reportNote').value = '';
+
+            renderApp();
+            if(document.getElementById('globalSearchInput').value) runGlobalSearch();
+        }
+
+        renderApp();
+    </script>
+</body>
+</html>
+ styling -->
     <script src="https://tailwindcss.com"></script>
     <style>
         body { background-color: #f8fafc; font-family: system-ui, -apple-system, sans-serif; }
