@@ -16,21 +16,18 @@
         .badge-Out { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
         .badge-Unknown { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
         .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
-        /* Dropdown custom suggestion boxes */
-        .search-suggest-box { position: absolute; width: 100%; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 12px 12px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .suggest-item { padding: 12px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f1f5f9; text-align: left; }
-        .suggest-item:hover { background: #f0fdfa; color: #0d9488; font-weight: 500; }
-        .modal-overlay { transition: opacity 0.2s ease; }
+        /* Smooth pop-up overlay transition configurations */
+        .modal-overlay { transition: opacity 0.2s ease, visibility 0.2s ease; }
     </style>
 </head>
-<body class="breeze-bg text-slate-800 pb-24" onclick="globalCloseAllDropdowns()">
+<body class="breeze-bg text-slate-800 pb-24">
 
     <!-- App Header Navbar -->
     <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
             <!-- Interactive Info Manual Icon Button -->
-            <button onclick="toggleManualModal(true); event.stopPropagation();" class="bg-teal-700 hover:bg-teal-800 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-teal-500 shadow-sm focus:outline-none active:scale-95" title="View Guide Manual">ℹ️</button>
+            <button onclick="toggleManualModal(true)" class="bg-teal-700 hover:bg-teal-800 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-teal-500 shadow-sm focus:outline-none active:scale-95" title="View Guide Manual">ℹ️</button>
         </div>
     </header>
 
@@ -74,7 +71,7 @@
     <main class="max-w-md mx-auto p-4 space-y-5">
         
         <!-- SECTION 1: GLOBAL SEARCH ENGINE (STORES, SETS, OR COUNTIES) -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-3" onclick="event.stopPropagation()">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-3">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">1. Global Search Engine</h2>
             <p class="text-xs text-slate-500">Filter live logs by typing a store name, set title, or full **County** (e.g., Cork, Dublin).</p>
             
@@ -86,7 +83,7 @@
         </div>
 
         <!-- SECTION 2: DEDICATED STORE REGISTRATION BOX -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4" onclick="event.stopPropagation()">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">2. Add a New Retail Store</h2>
             <p class="text-xs text-slate-500">Store missing from the dropdown tracker below? Add its details here instantly.</p>
             
@@ -109,14 +106,14 @@
         </div>
 
         <!-- SECTION 3: LOG LOGS & BROADCAST NEW SHELF FILE UPDATES -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4" onclick="event.stopPropagation()">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">3. Log a Shelf Report</h2>
             
-            <!-- Store Search Input Bar -->
-            <div class="relative">
+            <!-- BOTH SEARCH BARS REMAIN ACTIVE AND PRESERVED EXACTLY -->
+            <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Tracked Store Location</label>
-                <input type="text" id="storeSearchInput" oninput="showStoreSearchSuggestions()" onfocus="showStoreSearchSuggestions()" placeholder="Type to search saved shop locations..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <div id="storeSuggestBox" class="search-suggest-box hidden"></div>
+                <input type="text" id="storeSearchInput" list="storeDataList" onchange="forceFieldBlur('storeSearchInput')" placeholder="Type to search saved shop locations..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <datalist id="storeDataList"></datalist>
             </div>
 
             <!-- TCG Dropdowns -->
@@ -143,11 +140,11 @@
                 </div>
             </div>
 
-            <!-- TCG Set Search Input Bar -->
-            <div class="relative">
+            <!-- Expansion List Search Filter Bar -->
+            <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select TCG Expansion Set</label>
-                <input type="text" id="setSearchInput" oninput="showSetSearchSuggestions()" onfocus="showSetSearchSuggestions()" placeholder="Type to search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <div id="setSuggestBox" class="search-suggest-box hidden"></div>
+                <input type="text" id="setSearchInput" list="setDataList" onchange="forceFieldBlur('setSearchInput')" placeholder="Type to search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <datalist id="setDataList"></datalist>
             </div>
 
             <!-- Custom text comment notes box -->
@@ -215,85 +212,12 @@
             }
         }
 
-        // FIXED ACTION: Independent JavaScript dropdown processing store choices cleanly
-        function showStoreSearchSuggestions() {
-            const input = document.getElementById('storeSearchInput');
-            const box = document.getElementById('storeSuggestBox');
-            const query = input.value.toLowerCase().trim();
-            
-            box.innerHTML = '';
-            box.classList.remove('hidden');
-
-            const filtered = localStores.filter(s => s.name.toLowerCase().includes(query));
-            
-            if(filtered.length === 0) {
-                box.classList.add('hidden');
-                return;
+        // ABSOLUTE CLOSING FIX: The exact millisecond an option is clicked, this strips focus and kills the popup frame instantly
+        function forceFieldBlur(id) {
+            const inputField = document.getElementById(id);
+            if (inputField) {
+                inputField.blur(); // Drops phone keyboard and forcefully vanishes option box
             }
-
-            filtered.forEach(store => {
-                const item = document.createElement('div');
-                item.className = "suggest-item";
-                item.innerText = store.name;
-                item.onclick = (e) => {
-                    e.stopPropagation();
-                    input.value = store.name;
-                    selectedStoreKey = store.key;
-                    box.classList.add('hidden'); // BULLETPROOF: Snaps shut layout layer instantly
-                    input.blur();
-                };
-                box.appendChild(item);
-            });
-        }
-
-        // FIXED ACTION: Custom panel engine maps, updates input box text value, and closes instantly on choice click
-        function showSetSearchSuggestions() {
-            const input = document.getElementById('setSearchInput');
-            const box = document.getElementById('setSuggestBox');
-            const system = document.getElementById('gameSelect').value;
-            const query = input.value.toLowerCase().trim();
-
-            box.innerHTML = '';
-            box.classList.remove('hidden');
-
-            const targetArray = cachedSetsDatabase[system] || [];
-            const filtered = targetArray.filter(setName => setName.toLowerCase().includes(query));
-
-            if(filtered.length === 0) {
-                // Manual typing option
-                if(query.length > 0) {
-                    const item = document.createElement('div');
-                    item.className = "suggest-item italic text-slate-500";
-                    item.innerText = `Use custom: "${input.value}"`;
-                    item.onclick = (e) => {
-                        e.stopPropagation();
-                        box.classList.add('hidden');
-                        input.blur();
-                    };
-                    box.appendChild(item);
-                } else {
-                    box.classList.add('hidden');
-                }
-                return;
-            }
-
-            filtered.slice(0, 10).forEach(setName => {
-                const item = document.createElement('div');
-                item.className = "suggest-item";
-                item.innerText = setName;
-                item.onclick = (e) => {
-                    e.stopPropagation();
-                    input.value = setName;
-                    box.classList.add('hidden'); // BULLETPROOF: Destroys expansion dropdown view box immediately
-                    input.blur();
-                };
-                box.appendChild(item);
-            });
-        }
-
-        function globalCloseAllDropdowns() {
-            document.getElementById('storeSuggestBox').classList.add('hidden');
-            document.getElementById('setSuggestBox').classList.add('hidden');
         }
 
         function filterExpiredReports() {
@@ -385,8 +309,32 @@
             renderApp();
         }
 
+        function populateStoreDatalist() {
+            const list = document.getElementById('storeDataList');
+            list.innerHTML = '';
+            localStores.forEach(store => {
+                const opt = document.createElement('option');
+                opt.value = store.name;
+                list.appendChild(opt);
+            });
+        }
+
         function onGameSystemChange() {
             document.getElementById('setSearchInput').value = "";
+            populateSetDatalist();
+        }
+
+        function populateSetDatalist() {
+            const selectedSystem = document.getElementById('gameSelect').value;
+            const list = document.getElementById('setDataList');
+            list.innerHTML = '';
+
+            const targetSetArray = cachedSetsDatabase[selectedSystem] || [];
+            targetSetArray.forEach(setName => {
+                const opt = document.createElement('option');
+                opt.value = setName;
+                list.appendChild(opt);
+            });
         }
 
         function flagReport(id) {
@@ -433,6 +381,9 @@
                 `;
                 feed.prepend(card);
             });
+
+            populateStoreDatalist();
+            populateSetDatalist();
         }
 
         function submitReport() {
