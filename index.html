@@ -4,65 +4,61 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PackTracker Ireland</title>
-    <!-- Tailwind CSS for modern mobile layout styling -->
+    <!-- Tailwind CSS for mobile-optimized layout styling -->
     <script src="https://tailwindcss.com"></script>
     <style>
-        body { background-color: #f0fdfa; font-family: system-ui, -apple-system, sans-serif; }
-        .breeze-bg { background-color: #f0fdfa; }
-        .feed-card { background: white; padding: 16px; border-radius: 12px; border: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
+        /* NEW PREMIUM MIDNIGHT & GOLD THEMING CODES */
+        body { background-color: #0f172a; font-family: system-ui, -apple-system, sans-serif; color: #f8fafc; }
+        .dark-card { background-color: #1e293b; border: 1px solid #334155; }
+        .gold-glow { box-shadow: 0 0 12px rgba(234, 179, 8, 0.15); }
+        
         .badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; border: 1px solid; white-space: nowrap; }
-        .badge-Full { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
-        .badge-Low { background: #fef9c3; color: #854d0e; border-color: #fef08a; }
-        .badge-Out { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
-        .badge-Unknown { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
+        .badge-Full { background: #064e3b; color: #34d399; border-color: #047857; }
+        .badge-Low { background: #78350f; color: #fbeblock; color: #fbbf24; border-color: #b45309; }
+        .badge-Out { background: #7f1d1d; color: #f87171; border-color: #b91c1c; }
+        .badge-Unknown { background: #334155; color: #cbd5e1; border-color: #475569; }
         .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
-        /* Smooth pop-up overlay transition configurations */
-        .modal-overlay { transition: opacity 0.2s ease, visibility 0.2s ease; }
+        .modal-overlay { transition: opacity 0.2s ease; }
     </style>
 </head>
-<body class="breeze-bg text-slate-800 pb-24">
+<body class="text-slate-200 pb-24">
 
-    <!-- App Header Navbar -->
-    <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
+    <!-- App Header Navbar Layer with Gold Accents -->
+    <header class="bg-slate-900 text-white p-4 shadow-lg border-b border-amber-500/30 sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
-            <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
-            <!-- Interactive Info Manual Icon Button -->
-            <button onclick="toggleManualModal(true)" class="bg-teal-700 hover:bg-teal-800 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-teal-500 shadow-sm focus:outline-none active:scale-95" title="View Guide Manual">ℹ️</button>
+            <h1 class="text-xl font-bold tracking-wide text-amber-400 flex items-center gap-1.5">⚡ PackTracker Ireland</h1>
+            <button onclick="toggleManualModal(true)" class="bg-slate-800 hover:bg-slate-700 text-amber-400 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-amber-500/40 shadow-sm focus:outline-none active:scale-95">ℹ️</button>
         </div>
     </header>
 
     <!-- Native Light Guide Manual Pop-up Modal Container -->
-    <div id="manualModal" style="display: none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-overlay" onclick="toggleManualModal(false)">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-teal-100 max-h-[85vh] overflow-y-auto space-y-4" onclick="event.stopPropagation()">
-            <div class="flex justify-between items-center border-b border-slate-100 pb-2">
-                <h3 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">📖 PackTracker Manual</h3>
-                <button onclick="toggleManualModal(false)" class="text-slate-400 hover:text-slate-600 font-bold text-xl p-1">✕</button>
+    <div id="manualModal" style="display: none;" class="fixed inset-0 bg-slate-950/80 backdrop-blur-xs z-50 flex items-center justify-center p-4 modal-overlay" onclick="toggleManualModal(false)">
+        <div class="bg-slate-900 text-slate-100 rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-amber-500/20 max-h-[85vh] overflow-y-auto space-y-4" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-2">
+                <h3 class="font-bold text-amber-400 text-lg flex items-center gap-1.5">📖 PackTracker Manual</h3>
+                <button onclick="toggleManualModal(false)" class="text-slate-400 hover:text-slate-200 font-bold text-xl p-1">✕</button>
             </div>
             
-            <div class="space-y-3.5 text-sm text-slate-600 leading-relaxed">
+            <div class="space-y-3.5 text-sm text-slate-300 leading-relaxed">
                 <div>
-                    <strong class="text-teal-700 block mb-0.5">🔍 1. Global Search Engine</strong>
-                    <p>Type any county (e.g., "Cork"), specific store title, or TCG expansion set name into the search bar. The engine filters all logs instantly to isolate target shelves.</p>
+                    <strong class="text-amber-400 block mb-0.5">🔍 1. Global Search Engine</strong>
+                    <p>Type any county (e.g., "Cork"), store name, or set title to filter stock records instantly.</p>
                 </div>
                 <div>
-                    <strong class="text-teal-700 block mb-0.5">🏪 2. Add New Retail Stores</strong>
-                    <p>If your local store is missing from the selector index list, input its name into Section 2, choose its official Irish county, and tap save to link it globally.</p>
+                    <strong class="text-amber-400 block mb-0.5">🏪 2. Add New Retail Stores</strong>
+                    <p>Register missing shops locally by typing a name and assigning their Irish county parameters inside Section 2.</p>
                 </div>
                 <div>
-                    <strong class="text-teal-700 block mb-0.5">📝 3. Log a Shelf Report</strong>
-                    <p>Select your saved store, toggle the card game network, pick the availability level, and broadcast your update. Use custom notes for shelf details.</p>
+                    <strong class="text-amber-400 block mb-0.5">📝 3. Log a Shelf Report</strong>
+                    <p>Select your store and TCG expansion set, choose the stock color level, and broadcast updates to the feed grid.</p>
                 </div>
                 <div>
-                    <strong class="text-teal-700 block mb-0.5">⏳ 4. 48-Hour Auto-Expiry Filter</strong>
-                    <p>TCG shelves change incredibly fast. To keep files accurate, all community updates automatically age out and disappear from the log feed after exactly 48 hours.</p>
-                </div>
-                <div>
-                    <strong class="text-teal-700 block mb-0.5">⚠️ 5. Community Moderation</strong>
-                    <p>Spot an inaccurate entry or troll? Tap the Flag button next to the post log card. Once any stock report hits 5 flags, the algorithm forces an automatic status reset.</p>
+                    <strong class="text-amber-400 block mb-0.5">⏳ 4. 48-Hour Auto-Expiry Filter</strong>
+                    <p>To ensure high accuracy, all community tracker reports automatically age out and disappear from the network after exactly 48 hours.</p>
                 </div>
             </div>
 
-            <button onclick="toggleManualModal(false)" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2.5 rounded-xl shadow-md transition-all active:scale-[0.98] text-sm mt-2">
+            <button onclick="toggleManualModal(false)" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl shadow-md transition-all active:scale-[0.98] text-sm mt-2">
                 Got it, Let's Track!
             </button>
         </div>
@@ -70,58 +66,45 @@
 
     <main class="max-w-md mx-auto p-4 space-y-5">
         
-        <!-- SECTION 1: GLOBAL SEARCH ENGINE (STORES, SETS, OR COUNTIES) -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-3">
-            <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">1. Global Search Engine</h2>
-            <p class="text-xs text-slate-500">Filter live logs by typing a store name, set title, or full **County** (e.g., Cork, Dublin).</p>
-            
-            <div class="relative">
-                <input type="text" id="globalSearchInput" oninput="runGlobalSearch()" placeholder="Search store, set, or county..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 focus:ring-2 focus:ring-teal-500 focus:outline-none font-medium text-sm">
-            </div>
-            
+        <!-- SECTION 1: GLOBAL SEARCH ENGINE -->
+        <div class="dark-card gold-glow p-5 rounded-2xl shadow-sm space-y-3">
+            <h2 class="font-bold text-amber-400 text-lg flex items-center gap-1.5">1. Global Search Engine</h2>
+            <p class="text-xs text-slate-400">Filter logs instantly by typing a store name, set expansion title, or full **County**.</p>
+            <input type="text" id="globalSearchInput" oninput="runGlobalSearch()" placeholder="Search store, set, or county..." class="w-full bg-slate-950 border border-slate-700 text-slate-100 rounded-xl p-3 focus:ring-2 focus:ring-amber-500 focus:outline-none font-medium text-sm">
             <div id="searchResultsContainer" class="space-y-2 pt-1"></div>
         </div>
 
         <!-- SECTION 2: DEDICATED STORE REGISTRATION BOX -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
-            <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">2. Add a New Retail Store</h2>
-            <p class="text-xs text-slate-500">Store missing from the dropdown tracker below? Add its details here instantly.</p>
-            
+        <div class="dark-card p-5 rounded-2xl shadow-sm space-y-4">
+            <h2 class="font-bold text-amber-400 text-lg flex items-center gap-1.5">2. Add a New Retail Store</h2>
             <div class="grid grid-cols-3 gap-2">
                 <div class="col-span-2">
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">New Store Title</label>
-                    <input type="text" id="newStoreNameInput" placeholder="e.g. Tesco Superstore Bandon..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">New Store Title</label>
+                    <input type="text" id="newStoreNameInput" placeholder="e.g. Tesco Superstore Bandon..." class="w-full bg-slate-950 border border-slate-700 text-slate-100 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm font-medium">
                 </div>
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">County</label>
-                    <select id="newStoreCountySelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">County</label>
+                    <select id="newStoreCountySelect" class="w-full bg-slate-950 border border-slate-700 text-slate-100 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm">
                         <option value="Antrim">Antrim</option><option value="Armagh">Armagh</option><option value="Carlow">Carlow</option><option value="Cavan">Cavan</option><option value="Clare">Clare</option><option value="Cork" selected>Cork</option><option value="Derry">Derry</option><option value="Donegal">Donegal</option><option value="Down">Down</option><option value="Dublin">Dublin</option><option value="Fermanagh">Fermanagh</option><option value="Galway">Galway</option><option value="Kerry">Kerry</option><option value="Kildare">Kildare</option><option value="Kilkenny">Kilkenny</option><option value="Laois">Laois</option><option value="Leitrim">Leitrim</option><option value="Limerick">Limerick</option><option value="Longford">Longford</option><option value="Louth">Louth</option><option value="Mayo">Mayo</option><option value="Meath">Meath</option><option value="Monaghan">Monaghan</option><option value="Offaly">Offaly</option><option value="Roscommon">Roscommon</option><option value="Sligo">Sligo</option><option value="Tipperary">Tipperary</option><option value="Tyrone">Tyrone</option><option value="Waterford">Waterford</option><option value="Westmeath">Westmeath</option><option value="Wexford">Wexford</option><option value="Wicklow">Wicklow</option>
                     </select>
                 </div>
             </div>
-            
-            <button onclick="createNewStoreNatively()" class="w-full bg-slate-800 hover:bg-slate-900 text-white font-bold py-2.5 rounded-xl transition-all shadow-md text-sm active:scale-[0.99]">
+            <button onclick="createNewStoreNatively()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-2.5 rounded-xl transition-all shadow-md text-sm active:scale-[0.99]">
                 ➕ Save New Location to Database
             </button>
         </div>
 
-        <!-- SECTION 3: LOG LOGS & BROADCAST NEW SHELF FILE UPDATES -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
-            <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">3. Log a Shelf Report</h2>
-            
-            <!-- SEARCH INPUT BAR WITH AUTOMATIC BLUR ACTION -->
+        <!-- SECTION 3: LOG LOGS & BROADCAST UPDATES -->
+        <div class="dark-card p-5 rounded-2xl shadow-sm space-y-4">
+            <h2 class="font-bold text-amber-400 text-lg flex items-center gap-1.5">3. Log a Shelf Report</h2>
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Tracked Store Location (Search Bar)</label>
-                <input type="text" id="storeSearchInput" list="storeDataList" oninput="checkStoreSelectionInput()" placeholder="Type store name or town..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <div id="storeSearchResults" class="search-results-box hidden"></div>
-                <datalist id="storeDataList"></datalist>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Select Tracked Store Location</label>
+                <select id="storeSelect" class="w-full bg-slate-950 border border-slate-700 text-slate-100 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm font-medium"></select>
             </div>
-
-            <!-- TCG Dropdowns -->
             <div class="grid grid-cols-2 gap-3">
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Game System</label>
-                    <select id="gameSelect" onchange="onGameSystemChange()" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Game System</label>
+                    <select id="gameSelect" onchange="onGameSystemChange()" class="w-full bg-slate-500 bg-slate-950 border border-slate-700 text-slate-100 rounded-xl p-2.5 font-medium focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm">
                         <option value="pokemon-en">Pokémon (English)</option>
                         <option value="pokemon-jp">Pokémon (Japanese)</option>
                         <option value="lorcana">Disney Lorcana</option>
@@ -130,39 +113,53 @@
                         <option value="op">One Piece</option>
                     </select>
                 </div>
-
                 <div>
-                    <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Stock Status</label>
-                    <select id="statusSelect" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 font-bold focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm">
-                        <option value="Full" class="text-green-600">🟢 Full Stock</option>
-                        <option value="Low" class="text-yellow-600">🟡 Low Stock</option>
-                        <option value="Out" class="text-red-600">🔴 Out of Stock</option>
+                    <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Stock Status</label>
+                    <select id="statusSelect" class="w-full bg-slate-950 border border-slate-700 text-slate-100 rounded-xl p-2.5 font-bold focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm">
+                        <option value="Full" class="text-green-400">🟢 Full Stock</option>
+                        <option value="Low" class="text-amber-400">🟡 Low Stock</option>
+                        <option value="Out" class="text-red-400">🔴 Out of Stock</option>
                     </select>
                 </div>
             </div>
-
-            <!-- SEARCH INPUT BAR WITH AUTOMATIC BLUR ACTION -->
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select TCG Expansion Set (Search Bar)</label>
-                <input type="text" id="setSearchInput" list="setDataList" oninput="checkSetSelectionInput()" placeholder="Search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <datalist id="setDataList"></datalist>
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Select TCG Expansion Set</label>
+                <select id="setSelect" class="w-full bg-slate-950 border border-slate-700 text-slate-100 rounded-xl p-2.5 focus:ring-2 focus:ring-amber-500 focus:outline-none text-sm font-medium"></select>
             </div>
-
-            <!-- Custom text comment notes box -->
             <div>
-                <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Custom Note (Optional)</label>
-                <input type="text" id="reportNote" placeholder="e.g. Limit 2 boxes per person, items located inside checkout lane..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-teal-500">
+                <label class="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1">Custom Note (Optional)</label>
+                <input type="text" id="reportNote" placeholder="e.g. Behind checkout lane..." class="w-full bg-slate-950 border border-slate-700 text-slate-100 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500">
             </div>
-
-            <button onclick="submitReport()" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-3 rounded-xl transition-all shadow-md shadow-teal-100 active:scale-[0.98]">
+            <button onclick="submitReport()" class="w-full bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold py-3 rounded-xl transition-all shadow-md active:scale-[0.98]">
                 Broadcast Live Update
             </button>
         </div>
 
-        <!-- SECTION 4: LIVE RECENT FEED UPDATES TRACK TIMELINE TIMESTAMPS -->
+        <!-- SECTION 4: LIVE RECENT FEED UPDATES -->
         <div class="space-y-2.5">
-            <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider px-1">4. Live Feed Updates</h3>
+            <h3 class="font-bold text-sm text-slate-400 uppercase tracking-wider px-1">4. Live Feed Updates</h3>
             <div id="feedContainer" class="space-y-2"></div>
+        </div>
+
+        <!-- NEW FEATURE: SECURE LOCKED ADMIN SYSTEM PANEL BOX -->
+        <div class="dark-card p-5 rounded-2xl shadow-sm border border-slate-800">
+            <h2 class="font-bold text-slate-400 text-sm flex items-center gap-1.5 uppercase tracking-wider mb-2">🔑 Administrator Panel Login</h2>
+            <div id="adminAuthArea" class="flex gap-2">
+                <input type="password" id="adminPassKeyField" placeholder="Enter admin password to unlock management files..." class="flex-1 bg-slate-950 border border-slate-700 text-slate-100 rounded-xl p-2.5 text-sm focus:outline-none focus:ring-1 focus:ring-amber-500">
+                <button onclick="unlockAdminControlsPanel()" class="bg-slate-800 hover:bg-slate-700 text-amber-400 font-bold px-4 rounded-xl text-sm border border-slate-700 transition-colors">Unlock</button>
+            </div>
+            
+            <!-- Hidden Admin Tool Section managed natively -->
+            <div id="adminControlsArea" style="display: none;" class="space-y-4 pt-2">
+                <div class="border-t border-slate-700 pt-3">
+                    <h3 class="text-amber-400 text-xs font-bold uppercase tracking-wider mb-2">Manage Store List Directory</h3>
+                    <div id="adminStoreListContainer" class="space-y-1.5 max-h-40 overflow-y-auto bg-slate-950 p-2.5 rounded-xl border border-slate-800"></div>
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="clearAllFeedReportsAdmin()" class="flex-1 bg-red-900/30 hover:bg-red-900/60 text-red-400 border border-red-800 text-xs font-bold py-2 rounded-xl transition-colors">Wipe All Feed Logs</button>
+                    <button onclick="lockAdminPanelBack()" class="bg-slate-800 hover:bg-slate-700 text-slate-400 border border-slate-700 text-xs font-bold px-3 rounded-xl transition-colors">Lock Panel</button>
+                </div>
+            </div>
         </div>
 
     </main>
@@ -213,24 +210,63 @@
             }
         }
 
-        // AUTO-CLOSING BLUR TRIGGER: Tapping an option removes input focus, forcefully snapping the window shut
-        function checkStoreSelectionInput() {
-            const val = document.getElementById('storeSearchInput').value;
-            const match = localStores.find(s => s.name === val);
-            if (match) {
-                document.getElementById('storeSearchInput').blur(); // Drops keyboard focus instantly
+        // NEW ADMIN FUNCTION: Password entry validator to toggle the layout panels safely
+        function unlockAdminControlsPanel() {
+            const key = document.getElementById('adminPassKeyField').value.trim();
+            
+            // ADMIN PASSWORD LOG IN KEY: Hardcoded value token flag
+            if(key === "packcork2026") { 
+                document.getElementById('adminAuthArea').style.display = 'none';
+                document.getElementById('adminControlsArea').style.display = 'block';
+                document.getElementById('adminPassKeyField').value = '';
+                renderAdminStoreListGrid();
+            } else {
+                alert("Authorization Denied: Incorrect administrator passkey string entered.");
             }
         }
 
-        // AUTO-CLOSING BLUR TRIGGER: Tapping an expansion removes input focus, forcefully snapping the window shut
-        function checkSetSelectionInput() {
-            const currentSystem = document.getElementById('gameSelect').value;
-            const val = document.getElementById('setSearchInput').value;
-            const targetSetArray = cachedSetsDatabase[currentSystem] || [];
-            
-            const match = targetSetArray.find(setName => setName === val);
-            if (match) {
-                document.getElementById('setSearchInput').blur(); // Drops keyboard focus instantly
+        function lockAdminPanelBack() {
+            document.getElementById('adminAuthArea').style.display = 'flex';
+            document.getElementById('adminControlsArea').style.display = 'none';
+        }
+
+        // NEW ADMIN FUNCTION: Renders live store array lists with individual click-to-delete buttons
+        function renderAdminStoreListGrid() {
+            const box = document.getElementById('adminStoreListContainer');
+            box.innerHTML = '';
+
+            localStores.forEach(store => {
+                const flexRow = document.createElement('div');
+                flexRow.className = "flex justify-between items-center bg-slate-900 p-2 rounded-lg border border-slate-800 text-xs";
+                flexRow.innerHTML = `
+                    <span class="font-medium text-slate-300">${store.name} (${store.county})</span>
+                    <button onclick="deleteSingleStoreAdmin('${store.key}')" class="text-red-400 hover:text-red-500 font-bold bg-red-950/40 border border-red-900 px-2 py-0.5 rounded transition-colors">Delete</button>
+                `;
+                box.appendChild(flexRow);
+            });
+        }
+
+        // NEW ADMIN FUNCTION: Removes store node targets completely from array indexes on the fly
+        function deleteSingleStoreAdmin(storeKey) {
+            if(confirm("Admin Verification: Are you completely certain you want to erase this store location profile from the live dropdown database?")) {
+                localStores = localStores.filter(s => s.key !== storeKey);
+                localStorage.setItem('pt_stores', JSON.stringify(localStores));
+                
+                // Clear any lingering shelf logs associated with that specific deleted store profile
+                reports = reports.filter(r => r.storeKey !== storeKey);
+                localStorage.setItem('tcg_reports', JSON.stringify(reports));
+
+                renderAdminStoreListGrid();
+                renderApp();
+            }
+        }
+
+        // NEW ADMIN FUNCTION: Full data log timeline baseline reset command handler
+        function clearAllFeedReportsAdmin() {
+            if(confirm("Admin Verification: Are you completely certain you want to purge the entire live activity timeline feed from the tracking memory maps?")) {
+                reports = [];
+                localStorage.setItem('tcg_reports', JSON.stringify(reports));
+                renderApp();
             }
         }
 
@@ -267,7 +303,7 @@
             });
 
             if(filteredReports.length === 0) {
-                container.innerHTML = `<div class="text-xs text-slate-400 italic p-2 bg-white rounded-xl border border-slate-100">No active stock logs matched that query. Try logging an update below!</div>`;
+                container.innerHTML = `<div class="text-xs text-slate-400 italic p-2 bg-slate-900 rounded-xl border border-slate-800">No active stock logs matched that query. Try logging an update below!</div>`;
                 return;
             }
 
@@ -277,15 +313,15 @@
                 const dotMap = { 'Full': '🟢', 'Low': '🟡', 'Out': '🔴', 'Unknown': '⚪' };
 
                 const card = document.createElement('div');
-                card.className = "feed-card border-teal-200 bg-teal-50/30";
+                card.className = "feed-card bg-slate-900 border-amber-500/20";
                 card.innerHTML = `
                     <div style="flex:1; padding-right:12px;">
                         <div class="flex items-center gap-1.5">
-                            <strong class="text-teal-950 text-sm">${storeObj ? storeObj.name : 'Store Node'}</strong>
-                            <span class="text-[10px] bg-teal-100 text-teal-800 px-1.5 py-0.2 rounded border border-teal-200 font-bold uppercase font-mono">${storeObj ? storeObj.county : 'IE'}</span>
+                            <strong class="text-amber-100 text-sm">${storeObj ? storeObj.name : 'Store Node'}</strong>
+                            <span class="text-[10px] bg-slate-800 text-amber-400 px-1.5 py-0.2 rounded border border-slate-700 font-bold uppercase font-mono">${storeObj ? storeObj.county : 'IE'}</span>
                         </div>
-                        <div class="text-xs text-teal-700 font-medium mt-1">${report.set}</div>
-                        ${report.note ? `<div class="text-[11px] text-slate-600 bg-white border p-1.5 rounded mt-1.5 font-mono">Note: ${report.note}</div>` : ''}
+                        <div class="text-xs text-amber-500/80 font-medium mt-1">${report.set}</div>
+                        ${report.note ? `<div class="text-[11px] text-slate-300 bg-slate-950 border border-slate-800 p-1.5 rounded mt-1.5 font-mono">Note: ${report.note}</div>` : ''}
                     </div>
                     <div class="text-right flex flex-col items-end">
                         <span class="badge ${colorMap[report.status]}">${dotMap[report.status]} ${report.status}</span>
@@ -321,33 +357,35 @@
             alert(`Success: "${storeName} (${countySelected})" has been registered. You can now select it in Section 3!`);
             
             renderApp();
+            if(document.getElementById('adminControlsArea').style.display === 'block') renderAdminStoreListGrid();
         }
 
-        function populateStoreDatalist() {
-            const list = document.getElementById('storeDataList');
-            list.innerHTML = '';
+        function populateStoreDropdown() {
+            const select = document.getElementById('storeSelect');
+            select.innerHTML = '';
             localStores.forEach(store => {
                 const opt = document.createElement('option');
-                opt.value = store.name;
-                list.appendChild(opt);
+                opt.value = store.key;
+                opt.innerText = `${store.name} (${store.county})`;
+                select.appendChild(opt);
             });
         }
 
         function onGameSystemChange() {
-            document.getElementById('setSearchInput').value = "";
-            populateSetDatalist();
+            populateSetDropdown();
         }
 
-        function populateSetDatalist() {
+        function populateSetDropdown() {
             const selectedSystem = document.getElementById('gameSelect').value;
-            const list = document.getElementById('setDataList');
-            list.innerHTML = '';
+            const select = document.getElementById('setSelect');
+            select.innerHTML = '';
 
             const targetSetArray = cachedSetsDatabase[selectedSystem] || [];
             targetSetArray.forEach(setName => {
                 const opt = document.createElement('option');
                 opt.value = setName;
-                list.appendChild(opt);
+                opt.innerText = setName;
+                select.appendChild(opt);
             });
         }
 
@@ -377,44 +415,37 @@
                 const storeObj = localStores.find(s => s.key === report.storeKey);
                 
                 const card = document.createElement('div');
-                card.className = "feed-card";
+                card.className = "feed-card dark-card";
                 card.innerHTML = `
                     <div style="flex:1; padding-right:12px;">
                         <div class="flex items-center gap-1.5">
-                            <strong class="text-slate-900 text-sm">${storeObj ? storeObj.name : 'Added Location Node'}</strong>
-                            <span class="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.2 rounded border border-slate-200 font-bold uppercase">${storeObj ? storeObj.county : 'IE'}</span>
+                            <strong class="text-slate-100 text-sm">${storeObj ? storeObj.name : 'Added Location Node'}</strong>
+                            <span class="text-[9px] bg-slate-800 text-amber-400 px-1.5 py-0.2 rounded border border-slate-700 font-bold uppercase">${storeObj ? storeObj.county : 'IE'}</span>
                         </div>
-                        <div class="text-xs text-slate-500 font-medium mt-1">${report.set}</div>
-                        ${report.note ? `<div class="text-[11px] text-slate-600 bg-slate-50 border p-1.5 rounded mt-1.5 font-mono">${report.note}</div>` : ''}
+                        <div class="text-xs text-slate-400 font-medium mt-1">${report.set}</div>
+                        ${report.note ? `<div class="text-[11px] text-slate-300 bg-slate-950 border border-slate-800 p-1.5 rounded mt-1.5 font-mono">${report.note}</div>` : ''}
                     </div>
                     <div class="text-right flex flex-col items-end justify-between">
                         <span class="badge ${colorMap[report.status]}">${dotMap[report.status]} ${report.status}</span>
-                        <button onclick="flagReport(${report.id})" class="text-[10px] text-red-500 border border-red-200 bg-red-50 font-bold px-1.5 py-0.5 rounded mt-2.5 active:scale-95 transition-transform">⚠️ Flag (${report.flags || 0}/5)</button>
+                        <button onclick="flagReport(${report.id})" class="text-[10px] text-red-400 border border-red-900/60 bg-red-950/30 font-bold px-1.5 py-0.5 rounded mt-2.5 active:scale-95 transition-transform">⚠️ Flag (${report.flags || 0}/5)</button>
                         <div class="time-text mt-2">Time: ${report.time}</div>
                     </div>
                 `;
                 feed.prepend(card);
             });
 
-            populateStoreDatalist();
-            populateSetDatalist();
+            populateStoreDropdown();
+            populateSetDropdown();
         }
 
         function submitReport() {
-            const storeInputName = document.getElementById('storeSearchInput').value.trim();
-            const setInputName = document.getElementById('setSearchInput').value.trim();
+            const storeKeySelected = document.getElementById('storeSelect').value;
+            const setInputName = document.getElementById('setSelect').value;
             const status = document.getElementById('statusSelect').value;
             const note = document.getElementById('reportNote').value;
 
-            if(!storeInputName || !setInputName) {
+            if(!storeKeySelected || !setInputName) {
                 alert("Input Error: Choose a registered Store title and select a target Expansion Set before logging your update ticket.");
-                return;
-            }
-
-            let matchedStore = localStores.find(s => s.name.toLowerCase() === storeInputName.toLowerCase());
-            
-            if(!matchedStore) {
-                alert("Location Error: The store name you entered is not registered yet. Please type its title inside Section 2 to save it to the system first!");
                 return;
             }
 
@@ -423,7 +454,7 @@
 
             const newReport = {
                 id: Date.now(),
-                storeKey: matchedStore.key,
+                storeKey: storeKeySelected,
                 set: setInputName,
                 status: status,
                 note: note,
@@ -435,15 +466,7 @@
             reports.push(newReport);
             localStorage.setItem('tcg_reports', JSON.stringify(reports));
             
-            document.getElementById('storeSearchInput').value = '';
-            document.getElementById('setSearchInput').value = '';
             document.getElementById('reportNote').value = '';
 
             renderApp();
-            if(document.getElementById('globalSearchInput').value) runGlobalSearch();
-        }
-
-        renderApp();
-    </script>
-</body>
-</html>
+            if(document.getElementById('global
