@@ -16,8 +16,8 @@
         .badge-Out { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
         .badge-Unknown { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
         .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
-        /* Smooth pop-up overlay styles */
-        .modal-overlay { transition: opacity 0.25s ease; }
+        /* Smooth pop-up overlay transition configurations */
+        .modal-overlay { transition: opacity 0.2s ease, visibility 0.2s ease; }
     </style>
 </head>
 <body class="breeze-bg text-slate-800 pb-24">
@@ -26,14 +26,14 @@
     <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
-            <!-- NEW FEATURE: Interactive Info Manual Icon Button -->
-            <button onclick="toggleManualModal(true)" class="bg-teal-700 hover:bg-teal-800 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-teal-500 shadow-sm focus:outline-none active:scale-95" title="View Guide Manual">ℹ️</button>
+            <!-- Interactive Info Manual Icon Button -->
+            <button onclick="toggleManualModal(true)" class="bg-teal-700 hover:bg-teal-800 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-teal-500 shadow-sm focus:outline-none定位 active:scale-95" title="View Guide Manual">ℹ️</button>
         </div>
     </header>
 
-    <!-- FIXED LAYER DETAILS: Native Light Guide Manual Pop-up Modal Container -->
-    <div id="manualModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden opacity-0 modal-overlay">
-        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-teal-100 max-h-[85vh] overflow-y-auto space-y-4">
+    <!-- FIXED STYLE HANDLERS: Controlled explicitly via native display logic block rules to prevent Tailwind overrides -->
+    <div id="manualModal" style="display: none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-overlay">
+        <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-teal-100 max-h-[85vh] overflow-y-auto space-y-4" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                 <h3 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">📖 PackTracker Manual</h3>
                 <button onclick="toggleManualModal(false)" class="text-slate-400 hover:text-slate-600 font-bold text-xl focus:outline-none p-1">✕</button>
@@ -140,7 +140,7 @@
                 </div>
             </div>
 
-            <!-- TCG Set Search Filter Bar using native elements -->
+            <!-- TCG Set Search Filter Bar -->
             <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select TCG Expansion Set</label>
                 <input type="text" id="setSearchInput" list="setDataList" placeholder="Search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
@@ -201,15 +201,15 @@
             { id: 1, storeKey: "smyths-cork", set: "Pokémon: Mega Evolution Perfect Order", status: "Low", note: "Hanger racks filled behind customer service.", flags: 0, timestamp: Date.now(), time: "Just now" }
         ];
 
-        // NEW FIX: Correctly maps active display states of the popup frame window elements
+        // FIXED SUBROUTINE BLOCK: Targets style display engine variables directly to bypass Tailwind visibility crashes
         function toggleManualModal(show) {
             const modal = document.getElementById('manualModal');
             if (show) {
-                modal.classList.remove('hidden');
+                modal.style.display = 'flex'; // Force container display alignment block
                 setTimeout(() => modal.classList.remove('opacity-0'), 10);
             } else {
                 modal.classList.add('opacity-0');
-                setTimeout(() => modal.classList.add('hidden'), 250);
+                setTimeout(() => { modal.style.display = 'none'; }, 200); // Collapse visibility directly from memory tracking nodes
             }
         }
 
