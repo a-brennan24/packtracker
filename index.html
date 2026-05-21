@@ -9,9 +9,6 @@
     <style>
         body { background-color: #f0fdfa; font-family: system-ui, -apple-system, sans-serif; }
         .breeze-bg { background-color: #f0fdfa; }
-        .search-results-box { position: absolute; width: 100%; max-height: 220px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .search-item { padding: 12px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f1f5f9; }
-        .search-item:hover { background: #f0fdfa; color: #0d9488; font-weight: 500; }
         .feed-card { background: white; padding: 16px; border-radius: 12px; border: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
         .badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; border: 1px solid; white-space: nowrap; }
         .badge-Full { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
@@ -19,21 +16,26 @@
         .badge-Out { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
         .badge-Unknown { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
         .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
-        .modal-overlay { transition: opacity 0.2s ease, visibility 0.2s ease; }
+        /* Dropdown custom suggestion boxes */
+        .search-suggest-box { position: absolute; width: 100%; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 12px 12px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .suggest-item { padding: 12px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f1f5f9; text-align: left; }
+        .suggest-item:hover { background: #f0fdfa; color: #0d9488; font-weight: 500; }
+        .modal-overlay { transition: opacity 0.2s ease; }
     </style>
 </head>
-<body class="breeze-bg text-slate-800 pb-24" onclick="closeAllPickersGlobal()">
+<body class="breeze-bg text-slate-800 pb-24" onclick="globalCloseAllDropdowns()">
 
     <!-- App Header Navbar -->
     <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
+            <!-- Interactive Info Manual Icon Button -->
             <button onclick="toggleManualModal(true); event.stopPropagation();" class="bg-teal-700 hover:bg-teal-800 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-teal-500 shadow-sm focus:outline-none active:scale-95" title="View Guide Manual">ℹ️</button>
         </div>
     </header>
 
     <!-- Native Light Guide Manual Pop-up Modal Container -->
-    <div id="manualModal" style="display: none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 items-center justify-center p-4 modal-overlay">
+    <div id="manualModal" style="display: none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-overlay">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-teal-100 max-h-[85vh] overflow-y-auto space-y-4" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                 <h3 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">📖 PackTracker Manual</h3>
@@ -110,11 +112,11 @@
         <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4" onclick="event.stopPropagation()">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">3. Log a Shelf Report</h2>
             
-            <!-- STABLE SEARCH BAR: Custom store text input with instant closing hook -->
+            <!-- Store Search Input Bar -->
             <div class="relative">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Tracked Store Location</label>
-                <input type="text" id="storeSearchInput" oninput="filterStoreDropdownSearch()" onfocus="filterStoreDropdownSearch()" placeholder="Type to search saved shop location..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <div id="storeSearchResults" class="search-results-box hidden"></div>
+                <input type="text" id="storeSearchInput" oninput="showStoreSearchSuggestions()" onfocus="showStoreSearchSuggestions()" placeholder="Type to search saved shop locations..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <div id="storeSuggestBox" class="search-suggest-box hidden"></div>
             </div>
 
             <!-- TCG Dropdowns -->
@@ -141,11 +143,11 @@
                 </div>
             </div>
 
-            <!-- STABLE SEARCH BAR: Custom expansion set search input with instant closing hook -->
+            <!-- TCG Set Search Input Bar -->
             <div class="relative">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select TCG Expansion Set</label>
-                <input type="text" id="setSearchInput" oninput="filterSetDropdownSearch()" onfocus="filterSetDropdownSearch()" placeholder="Type to search card set names (e.g. Mega)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <div id="setSearchResults" class="search-results-box hidden"></div>
+                <input type="text" id="setSearchInput" oninput="showSetSearchSuggestions()" onfocus="showSetSearchSuggestions()" placeholder="Type to search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <div id="setSuggestBox" class="search-suggest-box hidden"></div>
             </div>
 
             <!-- Custom text comment notes box -->
@@ -160,7 +162,7 @@
         </div>
 
         <!-- SECTION 4: LIVE RECENT FEED UPDATES TRACK TIMELINE TIMESTAMPS -->
-        <div class="space-y-2.5" onclick="event.stopPropagation()">
+        <div class="space-y-2.5">
             <h3 class="font-bold text-sm text-slate-500 uppercase tracking-wider px-1">4. Live Feed Updates</h3>
             <div id="feedContainer" class="space-y-2"></div>
         </div>
@@ -213,67 +215,85 @@
             }
         }
 
-        // FIXED ADVANCED ENGINE: Handles store searching as a true text search bar layout
-        function filterStoreDropdownSearch() {
-            const query = document.getElementById('storeSearchInput').value.toLowerCase();
-            const resultsBox = document.getElementById('storeSearchResults');
-            resultsBox.innerHTML = '';
-            resultsBox.classList.remove('hidden');
+        // FIXED ACTION: Independent JavaScript dropdown processing store choices cleanly
+        function showStoreSearchSuggestions() {
+            const input = document.getElementById('storeSearchInput');
+            const box = document.getElementById('storeSuggestBox');
+            const query = input.value.toLowerCase().trim();
+            
+            box.innerHTML = '';
+            box.classList.remove('hidden');
 
             const filtered = localStores.filter(s => s.name.toLowerCase().includes(query));
             
-            filtered.forEach(store => {
-                const row = document.createElement('div');
-                row.className = "search-item";
-                row.innerText = store.name;
-                row.onclick = () => {
-                    document.getElementById('storeSearchInput').value = store.name;
-                    selectedStoreKey = store.key;
-                    resultsBox.classList.add('hidden'); // CRITICAL HOOK: Hard-closes the box instantly upon click
-                };
-                resultsBox.appendChild(row);
-            });
-        }
-
-        // FIXED ADVANCED ENGINE: Handles TCG expansion filtering as a true text search bar layout
-        function filterSetDropdownSearch() {
-            const currentSystem = document.getElementById('gameSelect').value;
-            const query = document.getElementById('setSearchInput').value.toLowerCase();
-            const resultsBox = document.getElementById('setSearchResults');
-            resultsBox.innerHTML = '';
-            resultsBox.classList.remove('hidden');
-
-            const targetSetArray = cachedSetsDatabase[currentSystem] || [];
-            const filtered = targetSetArray.filter(setName => setName.toLowerCase().includes(query));
-
-            filtered.slice(0, 15).forEach(setName => {
-                const row = document.createElement('div');
-                row.className = "search-item";
-                row.innerText = setName;
-                row.onclick = () => {
-                    document.getElementById('setSearchInput').value = setName;
-                    selectedSetName = setName;
-                    resultsBox.classList.add('hidden'); // CRITICAL HOOK: Hard-closes the box instantly upon click
-                };
-                resultsBox.appendChild(row);
-            });
-
-            if(filtered.length === 0 && query.length > 0) {
-                const manualRow = document.createElement('div');
-                manualRow.className = "search-item text-slate-500 italic";
-                manualRow.innerText = `Use custom input: "${document.getElementById('setSearchInput').value}"`;
-                manualRow.onclick = () => {
-                    selectedSetName = document.getElementById('setSearchInput').value;
-                    resultsBox.classList.add('hidden'); // CRITICAL HOOK: Hard-closes on custom input confirm
-                };
-                resultsBox.appendChild(manualRow);
+            if(filtered.length === 0) {
+                box.classList.add('hidden');
+                return;
             }
+
+            filtered.forEach(store => {
+                const item = document.createElement('div');
+                item.className = "suggest-item";
+                item.innerText = store.name;
+                item.onclick = (e) => {
+                    e.stopPropagation();
+                    input.value = store.name;
+                    selectedStoreKey = store.key;
+                    box.classList.add('hidden'); // BULLETPROOF: Snaps shut layout layer instantly
+                    input.blur();
+                };
+                box.appendChild(item);
+            });
         }
 
-        // CRITICAL SAFETY HOOK: Tapping blank screen borders instantly drops sticking search frame layers
-        function closeAllPickersGlobal() {
-            document.getElementById('storeSearchResults').classList.add('hidden');
-            document.getElementById('setSearchResults').classList.add('hidden');
+        // FIXED ACTION: Custom panel engine maps, updates input box text value, and closes instantly on choice click
+        function showSetSearchSuggestions() {
+            const input = document.getElementById('setSearchInput');
+            const box = document.getElementById('setSuggestBox');
+            const system = document.getElementById('gameSelect').value;
+            const query = input.value.toLowerCase().trim();
+
+            box.innerHTML = '';
+            box.classList.remove('hidden');
+
+            const targetArray = cachedSetsDatabase[system] || [];
+            const filtered = targetArray.filter(setName => setName.toLowerCase().includes(query));
+
+            if(filtered.length === 0) {
+                // Manual typing option
+                if(query.length > 0) {
+                    const item = document.createElement('div');
+                    item.className = "suggest-item italic text-slate-500";
+                    item.innerText = `Use custom: "${input.value}"`;
+                    item.onclick = (e) => {
+                        e.stopPropagation();
+                        box.classList.add('hidden');
+                        input.blur();
+                    };
+                    box.appendChild(item);
+                } else {
+                    box.classList.add('hidden');
+                }
+                return;
+            }
+
+            filtered.slice(0, 10).forEach(setName => {
+                const item = document.createElement('div');
+                item.className = "suggest-item";
+                item.innerText = setName;
+                item.onclick = (e) => {
+                    e.stopPropagation();
+                    input.value = setName;
+                    box.classList.add('hidden'); // BULLETPROOF: Destroys expansion dropdown view box immediately
+                    input.blur();
+                };
+                box.appendChild(item);
+            });
+        }
+
+        function globalCloseAllDropdowns() {
+            document.getElementById('storeSuggestBox').classList.add('hidden');
+            document.getElementById('setSuggestBox').classList.add('hidden');
         }
 
         function filterExpiredReports() {
@@ -407,7 +427,7 @@
                     </div>
                     <div class="text-right flex flex-col items-end justify-between">
                         <span class="badge ${colorMap[report.status]}">${dotMap[report.status]} ${report.status}</span>
-                        <button onclick="flagReport(${report.id}); event.stopPropagation();" class="text-[10px] text-red-500 border border-red-200 bg-red-50 font-bold px-1.5 py-0.5 rounded mt-2.5 active:scale-95 transition-transform">⚠️ Flag (${report.flags || 0}/5)</button>
+                        <button onclick="flagReport(${report.id})" class="text-[10px] text-red-500 border border-red-200 bg-red-50 font-bold px-1.5 py-0.5 rounded mt-2.5 active:scale-95 transition-transform">⚠️ Flag (${report.flags || 0}/5)</button>
                         <div class="time-text mt-2">Time: ${report.time}</div>
                     </div>
                 `;
