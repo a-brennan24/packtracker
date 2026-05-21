@@ -16,21 +16,18 @@
         .badge-Out { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
         .badge-Unknown { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
         .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
+        /* Smooth pop-up overlay transition configurations */
         .modal-overlay { transition: opacity 0.2s ease, visibility 0.2s ease; }
-        
-        /* Smooth floating container look for the custom search dropdown overlay frames */
-        .autocomplete-box { position: absolute; width: 100%; max-height: 200px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 12px 12px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
-        .autocomplete-item { padding: 12px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f1f5f9; }
-        .autocomplete-item:hover { background: #f0fdfa; color: #0d9488; font-weight: 600; }
     </style>
 </head>
-<body class="breeze-bg text-slate-800 pb-24" onclick="closeAllInputMenusGlobal()">
+<body class="breeze-bg text-slate-800 pb-24">
 
     <!-- App Header Navbar -->
     <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
-            <button onclick="toggleManualModal(true); event.stopPropagation();" class="bg-teal-700 hover:bg-teal-800 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-teal-500 shadow-sm focus:outline-none active:scale-95" title="View Guide Manual">ℹ️</button>
+            <!-- Interactive Info Manual Icon Button -->
+            <button onclick="toggleManualModal(true)" class="bg-teal-700 hover:bg-teal-800 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-teal-500 shadow-sm focus:outline-none active:scale-95" title="View Guide Manual">ℹ️</button>
         </div>
     </header>
 
@@ -53,7 +50,7 @@
                 </div>
                 <div>
                     <strong class="text-teal-700 block mb-0.5">📝 3. Log a Shelf Report</strong>
-                    <p>Select your saved store, toggle the card game network, type keywords into the live expansion filter search, pick availability, and broadcast updates.</p>
+                    <p>Select your saved store, toggle the card game network, pick the availability level, and broadcast your update. Use custom notes for shelf details.</p>
                 </div>
                 <div>
                     <strong class="text-teal-700 block mb-0.5">⏳ 4. 48-Hour Auto-Expiry Filter</strong>
@@ -74,7 +71,7 @@
     <main class="max-w-md mx-auto p-4 space-y-5">
         
         <!-- SECTION 1: GLOBAL SEARCH ENGINE (STORES, SETS, OR COUNTIES) -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-3" onclick="event.stopPropagation()">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-3">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">1. Global Search Engine</h2>
             <p class="text-xs text-slate-500">Filter live logs by typing a store name, set title, or full **County** (e.g., Cork, Dublin).</p>
             
@@ -86,7 +83,7 @@
         </div>
 
         <!-- SECTION 2: DEDICATED STORE REGISTRATION BOX -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4" onclick="event.stopPropagation()">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">2. Add a New Retail Store</h2>
             <p class="text-xs text-slate-500">Store missing from the dropdown tracker below? Add its details here instantly.</p>
             
@@ -109,14 +106,15 @@
         </div>
 
         <!-- SECTION 3: LOG LOGS & BROADCAST NEW SHELF FILE UPDATES -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4" onclick="event.stopPropagation()">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">3. Log a Shelf Report</h2>
             
-            <!-- Upgraded Store Custom Search Bar -->
-            <div class="relative">
+            <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Tracked Store Location</label>
-                <input type="text" id="storeSearchInput" oninput="filterStoreFormSearch()" onfocus="filterStoreFormSearch()" placeholder="Type to filter retail store index names..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <div id="storeSearchResults" class="autocomplete-box hidden"></div>
+                <!-- FIXED EVENT LISTENER: oninput dynamically tracks choice and pulls focus drop down closed -->
+                <input type="text" id="storeSearchInput" list="storeDataList" oninput="checkStoreSelectionInput()" placeholder="Type or click to choose saved shop location..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <div id="storeSearchResults" class="search-results-box hidden"></div>
+                <datalist id="storeDataList"></datalist>
             </div>
 
             <!-- TCG Dropdowns -->
@@ -143,11 +141,12 @@
                 </div>
             </div>
 
-            <!-- UPGRADED: Expansion Set Interactive Live Filter Search Bar (Replaces old lists) -->
-            <div class="relative">
+            <!-- TCG Set Search Filter Bar -->
+            <div>
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select TCG Expansion Set</label>
-                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" onfocus="filterGlobalSetSearch()" placeholder="Type expansion name keywords (e.g. destined, mega)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <div id="setSearchResults" class="autocomplete-box hidden"></div>
+                <!-- FIXED EVENT LISTENER: oninput forces the layout panels to collapse seamlessly upon choice confirmation -->
+                <input type="text" id="setSearchInput" list="setDataList" oninput="checkSetSelectionInput()" placeholder="Search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <datalist id="setDataList"></datalist>
             </div>
 
             <!-- Custom text comment notes box -->
@@ -204,8 +203,6 @@
             { id: 1, storeKey: "smyths-cork", set: "Pokémon: Mega Evolution Perfect Order", status: "Low", note: "Hanger racks filled behind customer service.", flags: 0, timestamp: Date.now(), time: "Just now" }
         ];
 
-        let selectedStoreKey = null;
-
         function toggleManualModal(show) {
             const modal = document.getElementById('manualModal');
             if (show) {
@@ -214,6 +211,27 @@
             } else {
                 modal.classList.add('opacity-0');
                 setTimeout(() => { modal.style.display = 'none'; }, 200); 
+            }
+        }
+
+        // NEW LOGIC: Scans input text stream, automatically dropping focus targets once a list match is confirmed
+        function checkStoreSelectionInput() {
+            const val = document.getElementById('storeSearchInput').value;
+            const match = localStores.find(s => s.name === val);
+            if (match) {
+                document.getElementById('storeSearchInput').blur(); // Snaps keyboard and options tray down instantly
+            }
+        }
+
+        // NEW LOGIC: Snaps expansion datalist selection box shut immediately upon selection tap matching
+        function checkSetSelectionInput() {
+            const currentSystem = document.getElementById('gameSelect').value;
+            const val = document.getElementById('setSearchInput').value;
+            const targetSetArray = cachedSetsDatabase[currentSystem] || [];
+            
+            const match = targetSetArray.find(setName => setName === val);
+            if (match || val.length > 30) { // Safety backup handles custom long-string overrides
+                document.getElementById('setSearchInput').blur();
             }
         }
 
@@ -279,81 +297,6 @@
             });
         }
 
-        // NEW UPGRADE: High-speed Store text filter framework
-        function filterStoreFormSearch() {
-            const query = document.getElementById('storeSearchInput').value.toLowerCase().trim();
-            const resultsBox = document.getElementById('storeSearchResults');
-            resultsBox.innerHTML = '';
-            resultsBox.classList.remove('hidden');
-
-            const filtered = localStores.filter(s => s.name.toLowerCase().includes(query));
-            
-            filtered.forEach(store => {
-                const row = document.createElement('div');
-                row.className = "autocomplete-item";
-                row.innerText = `${store.name} (${store.county})`;
-                row.onmousedown = (e) => {
-                    e.stopPropagation();
-                    document.getElementById('storeSearchInput').value = store.name;
-                    selectedStoreKey = store.key;
-                    resultsBox.classList.add('hidden');
-                };
-                resultsBox.appendChild(row);
-            });
-
-            if (filtered.length === 0) {
-                resultsBox.innerHTML = `<div class="p-3 text-xs text-slate-400 italic">No registered store matching description. Create it in Section 2 first!</div>`;
-            }
-        }
-
-        // NEW UPGRADE: Fluid interactive text filter search bar logic for sets
-        function filterGlobalSetSearch() {
-            const selectedSystem = document.getElementById('gameSelect').value;
-            const query = document.getElementById('setSearchInput').value.toLowerCase().trim();
-            const resultsBox = document.getElementById('setSearchResults');
-            resultsBox.innerHTML = '';
-            resultsBox.classList.remove('hidden');
-
-            const targetSetArray = cachedSetsDatabase[selectedSystem] || [];
-            
-            // Filters data values cleanly on the fly while typing input text keywords
-            const filtered = targetSetArray.filter(setName => setName.toLowerCase().includes(query));
-
-            filtered.slice(0, 10).forEach(setName => {
-                const row = document.createElement('div');
-                row.className = "autocomplete-item";
-                row.innerText = setName;
-                row.onmousedown = (e) => {
-                    e.stopPropagation();
-                    document.getElementById('setSearchInput').value = setName;
-                    resultsBox.classList.add('hidden');
-                };
-                resultsBox.appendChild(row);
-            });
-
-            // Fast fallback: If typing an obscure set, lock down manual choice overlay ticket
-            if (filtered.length === 0 && query.length > 0) {
-                const manualRow = document.createElement('div');
-                manualRow.className = "autocomplete-item text-slate-500 italic";
-                manualRow.innerText = `Use input text: "${document.getElementById('setSearchInput').value}"`;
-                manualRow.onmousedown = (e) => {
-                    e.stopPropagation();
-                    resultsBox.classList.add('hidden');
-                };
-                resultsBox.appendChild(manualRow);
-            }
-        }
-
-        // GLOBAL HANDLER LAYER: Safe click-away events automatically drop dropdown boxes
-        function closeAllInputMenusGlobal() {
-            document.getElementById('storeSearchResults').classList.add('hidden');
-            document.getElementById('setSearchResults').classList.add('hidden');
-        }
-
-        function onGameSystemChange() {
-            document.getElementById('setSearchInput').value = "";
-        }
-
         function createNewStoreNatively() {
             const storeName = document.getElementById('newStoreNameInput').value.trim();
             const countySelected = document.getElementById('newStoreCountySelect').value;
@@ -379,6 +322,34 @@
             alert(`Success: "${storeName} (${countySelected})" has been registered. You can now select it in Section 3!`);
             
             renderApp();
+        }
+
+        function populateStoreDatalist() {
+            const list = document.getElementById('storeDataList');
+            list.innerHTML = '';
+            localStores.forEach(store => {
+                const opt = document.createElement('option');
+                opt.value = store.name;
+                list.appendChild(opt);
+            });
+        }
+
+        function onGameSystemChange() {
+            document.getElementById('setSearchInput').value = "";
+            populateSetDatalist();
+        }
+
+        function populateSetDatalist() {
+            const selectedSystem = document.getElementById('gameSelect').value;
+            const list = document.getElementById('setDataList');
+            list.innerHTML = '';
+
+            const targetSetArray = cachedSetsDatabase[selectedSystem] || [];
+            targetSetArray.forEach(setName => {
+                const opt = document.createElement('option');
+                opt.value = setName;
+                list.appendChild(opt);
+            });
         }
 
         function flagReport(id) {
@@ -425,6 +396,9 @@
                 `;
                 feed.prepend(card);
             });
+
+            populateStoreDatalist();
+            populateSetDatalist();
         }
 
         function submitReport() {
