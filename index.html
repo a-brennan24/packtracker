@@ -9,6 +9,9 @@
     <style>
         body { background-color: #f0fdfa; font-family: system-ui, -apple-system, sans-serif; }
         .breeze-bg { background-color: #f0fdfa; }
+        .search-results-box { position: absolute; width: 100%; max-height: 220px; overflow-y: auto; background: white; border: 1px solid #cbd5e1; border-radius: 0 0 8px 8px; z-index: 100; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); }
+        .search-item { padding: 12px; cursor: pointer; font-size: 14px; border-bottom: 1px solid #f1f5f9; }
+        .search-item:hover { background: #f0fdfa; color: #0d9488; font-weight: 500; }
         .feed-card { background: white; padding: 16px; border-radius: 12px; border: 1px solid #f1f5f9; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; }
         .badge { display: inline-block; font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 6px; border: 1px solid; white-space: nowrap; }
         .badge-Full { background: #dcfce7; color: #166534; border-color: #bbf7d0; }
@@ -16,23 +19,21 @@
         .badge-Out { background: #fee2e2; color: #991b1b; border-color: #fca5a5; }
         .badge-Unknown { background: #f1f5f9; color: #475569; border-color: #e2e8f0; }
         .time-text { font-size: 10px; color: #94a3b8; margin-top: 4px; }
-        /* Smooth pop-up overlay transition configurations */
         .modal-overlay { transition: opacity 0.2s ease, visibility 0.2s ease; }
     </style>
 </head>
-<body class="breeze-bg text-slate-800 pb-24">
+<body class="breeze-bg text-slate-800 pb-24" onclick="closeAllDropdownsGlobal()">
 
     <!-- App Header Navbar -->
     <header class="bg-teal-600 text-white p-4 shadow-md sticky top-0 z-50">
         <div class="max-w-md mx-auto flex justify-between items-center">
             <h1 class="text-xl font-bold tracking-wide">⚡ PackTracker Ireland</h1>
-            <!-- Interactive Info Manual Icon Button -->
-            <button onclick="toggleManualModal(true)" class="bg-teal-700 hover:bg-teal-800 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-teal-500 shadow-sm focus:outline-none active:scale-95" title="View Guide Manual">ℹ️</button>
+            <button onclick="toggleManualModal(true); event.stopPropagation();" class="bg-teal-700 hover:bg-teal-800 transition-colors w-8 h-8 rounded-full flex items-center justify-center font-bold font-mono text-base border border-teal-500 shadow-sm focus:outline-none active:scale-95" title="View Guide Manual">ℹ️</button>
         </div>
     </header>
 
-    <!-- Native Light Guide Manual Pop-up Modal Container -->
-    <div id="manualModal" style="display: none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-overlay">
+    <!-- Native Guide Manual Pop-up Modal Container -->
+    <div id="manualModal" style="display: none;" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 modal-overlay" onclick="toggleManualModal(false)">
         <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-teal-100 max-h-[85vh] overflow-y-auto space-y-4" onclick="event.stopPropagation()">
             <div class="flex justify-between items-center border-b border-slate-100 pb-2">
                 <h3 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">📖 PackTracker Manual</h3>
@@ -71,7 +72,7 @@
     <main class="max-w-md mx-auto p-4 space-y-5">
         
         <!-- SECTION 1: GLOBAL SEARCH ENGINE (STORES, SETS, OR COUNTIES) -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-3">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-3" onclick="event.stopPropagation()">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">1. Global Search Engine</h2>
             <p class="text-xs text-slate-500">Filter live logs by typing a store name, set title, or full **County** (e.g., Cork, Dublin).</p>
             
@@ -83,7 +84,7 @@
         </div>
 
         <!-- SECTION 2: DEDICATED STORE REGISTRATION BOX -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4" onclick="event.stopPropagation()">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">2. Add a New Retail Store</h2>
             <p class="text-xs text-slate-500">Store missing from the dropdown tracker below? Add its details here instantly.</p>
             
@@ -106,15 +107,14 @@
         </div>
 
         <!-- SECTION 3: LOG LOGS & BROADCAST NEW SHELF FILE UPDATES -->
-        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4">
+        <div class="bg-white p-5 rounded-2xl shadow-sm border border-teal-100 space-y-4" onclick="event.stopPropagation()">
             <h2 class="font-bold text-teal-900 text-lg flex items-center gap-1.5">3. Log a Shelf Report</h2>
             
-            <div>
+            <!-- RESTORED: Floating Search Bar for Stores -->
+            <div class="relative">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select Tracked Store Location</label>
-                <!-- FIXED EVENT LISTENER: oninput dynamically tracks choice and pulls focus drop down closed -->
-                <input type="text" id="storeSearchInput" list="storeDataList" oninput="checkStoreSelectionInput()" placeholder="Type or click to choose saved shop location..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <input type="text" id="storeSearchInput" oninput="filterStoreFormSearch()" onfocus="filterStoreFormSearch()" placeholder="Type to search saved stores..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
                 <div id="storeSearchResults" class="search-results-box hidden"></div>
-                <datalist id="storeDataList"></datalist>
             </div>
 
             <!-- TCG Dropdowns -->
@@ -141,12 +141,11 @@
                 </div>
             </div>
 
-            <!-- TCG Set Search Filter Bar -->
-            <div>
+            <!-- RESTORED: Floating Search Bar for Expansion Sets -->
+            <div class="relative">
                 <label class="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-1">Select TCG Expansion Set</label>
-                <!-- FIXED EVENT LISTENER: oninput forces the layout panels to collapse seamlessly upon choice confirmation -->
-                <input type="text" id="setSearchInput" list="setDataList" oninput="checkSetSelectionInput()" placeholder="Search set names (e.g. Mega Evolution)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
-                <datalist id="setDataList"></datalist>
+                <input type="text" id="setSearchInput" oninput="filterGlobalSetSearch()" onfocus="filterGlobalSetSearch()" placeholder="Type to search set names (e.g. Mega, Destined)..." class="w-full bg-slate-50 border border-slate-200 rounded-xl p-2.5 focus:ring-2 focus:ring-teal-500 focus:outline-none text-sm font-medium">
+                <div id="setSearchResults" class="search-results-box hidden"></div>
             </div>
 
             <!-- Custom text comment notes box -->
@@ -211,27 +210,6 @@
             } else {
                 modal.classList.add('opacity-0');
                 setTimeout(() => { modal.style.display = 'none'; }, 200); 
-            }
-        }
-
-        // NEW LOGIC: Scans input text stream, automatically dropping focus targets once a list match is confirmed
-        function checkStoreSelectionInput() {
-            const val = document.getElementById('storeSearchInput').value;
-            const match = localStores.find(s => s.name === val);
-            if (match) {
-                document.getElementById('storeSearchInput').blur(); // Snaps keyboard and options tray down instantly
-            }
-        }
-
-        // NEW LOGIC: Snaps expansion datalist selection box shut immediately upon selection tap matching
-        function checkSetSelectionInput() {
-            const currentSystem = document.getElementById('gameSelect').value;
-            const val = document.getElementById('setSearchInput').value;
-            const targetSetArray = cachedSetsDatabase[currentSystem] || [];
-            
-            const match = targetSetArray.find(setName => setName === val);
-            if (match || val.length > 30) { // Safety backup handles custom long-string overrides
-                document.getElementById('setSearchInput').blur();
             }
         }
 
@@ -324,32 +302,82 @@
             renderApp();
         }
 
-        function populateStoreDatalist() {
-            const list = document.getElementById('storeDataList');
-            list.innerHTML = '';
-            localStores.forEach(store => {
-                const opt = document.createElement('option');
-                opt.value = store.name;
-                list.appendChild(opt);
+        // FIXED FLOATING SEARCH LOGIC: Closes and assigns choices cleanly on item click
+        function filterStoreFormSearch() {
+            const query = document.getElementById('storeSearchInput').value.toLowerCase();
+            const resultsBox = document.getElementById('storeSearchResults');
+            resultsBox.innerHTML = '';
+            
+            resultsBox.classList.remove('hidden');
+
+            const filtered = localStores.filter(s => s.name.toLowerCase().includes(query));
+            if(filtered.length === 0) {
+                resultsBox.innerHTML = `<div class="p-3 text-xs text-slate-400 italic">No matching store. Register it above in Section 2 first!</div>`;
+                return;
+            }
+
+            filtered.forEach(store => {
+                const row = document.createElement('div');
+                row.className = "search-item";
+                row.innerText = store.name;
+                row.onclick = (e) => {
+                    e.stopPropagation(); // Prevents layout interference
+                    document.getElementById('storeSearchInput').value = store.name;
+                    selectedStoreKey = store.key;
+                    resultsBox.classList.add('hidden'); // SNAPS CLOSED INSTANTLY
+                };
+                resultsBox.appendChild(row);
             });
         }
 
         function onGameSystemChange() {
             document.getElementById('setSearchInput').value = "";
-            populateSetDatalist();
+            selectedSetName = "";
+            document.getElementById('setSearchResults').classList.add('hidden');
         }
 
-        function populateSetDatalist() {
+        // FIXED FLOATING SEARCH LOGIC: Restored custom floating dropdown filters with explicit layout termination triggers
+        function filterGlobalSetSearch() {
             const selectedSystem = document.getElementById('gameSelect').value;
-            const list = document.getElementById('setDataList');
-            list.innerHTML = '';
+            const query = document.getElementById('setSearchInput').value.toLowerCase();
+            const resultsBox = document.getElementById('setSearchResults');
+            resultsBox.innerHTML = '';
+            
+            resultsBox.classList.remove('hidden');
 
             const targetSetArray = cachedSetsDatabase[selectedSystem] || [];
-            targetSetArray.forEach(setName => {
-                const opt = document.createElement('option');
-                opt.value = setName;
-                list.appendChild(opt);
+            const filtered = targetSetArray.filter(setName => setName.toLowerCase().includes(query));
+
+            filtered.slice(0, 15).forEach(setName => {
+                const row = document.createElement('div');
+                row.className = "search-item";
+                row.innerText = setName;
+                row.onclick = (e) => {
+                    e.stopPropagation();
+                    document.getElementById('setSearchInput').value = setName;
+                    selectedSetName = setName;
+                    resultsBox.classList.add('hidden'); // SNAPS CLOSED INSTANTLY UPON ITEM SELECTION CLICK
+                };
+                resultsBox.appendChild(row);
             });
+
+            if(filtered.length === 0 && query.length > 0) {
+                const manualRow = document.createElement('div');
+                manualRow.className = "search-item text-slate-500 italic";
+                manualRow.innerText = `Use custom input: "${document.getElementById('setSearchInput').value}"`;
+                manualRow.onclick = (e) => {
+                    e.stopPropagation();
+                    selectedSetName = document.getElementById('setSearchInput').value;
+                    resultsBox.classList.add('hidden'); // SNAPS CLOSED FOR CUSTOM MANUALLY TYPED OVERRIDES
+                };
+                resultsBox.appendChild(manualRow);
+            }
+        }
+
+        // GLOBAL CLOSURE TRIGGERS: Tapping anywhere else outside forms drops lingering overlay boxes
+        function closeAllDropdownsGlobal() {
+            document.getElementById('storeSearchResults').classList.add('hidden');
+            document.getElementById('setSearchResults').classList.add('hidden');
         }
 
         function flagReport(id) {
@@ -390,15 +418,12 @@
                     </div>
                     <div class="text-right flex flex-col items-end justify-between">
                         <span class="badge ${colorMap[report.status]}">${dotMap[report.status]} ${report.status}</span>
-                        <button onclick="flagReport(${report.id})" class="text-[10px] text-red-500 border border-red-200 bg-red-50 font-bold px-1.5 py-0.5 rounded mt-2.5 active:scale-95 transition-transform">⚠️ Flag (${report.flags || 0}/5)</button>
+                        <button onclick="flagReport(${report.id}); event.stopPropagation();" class="text-[10px] text-red-500 border border-red-200 bg-red-50 font-bold px-1.5 py-0.5 rounded mt-2.5 active:scale-95 transition-transform">⚠️ Flag (${report.flags || 0}/5)</button>
                         <div class="time-text mt-2">Time: ${report.time}</div>
                     </div>
                 `;
                 feed.prepend(card);
             });
-
-            populateStoreDatalist();
-            populateSetDatalist();
         }
 
         function submitReport() {
@@ -439,6 +464,8 @@
             document.getElementById('storeSearchInput').value = '';
             document.getElementById('setSearchInput').value = '';
             document.getElementById('reportNote').value = '';
+            selectedStoreKey = null;
+            selectedSetName = "";
 
             renderApp();
             if(document.getElementById('globalSearchInput').value) runGlobalSearch();
