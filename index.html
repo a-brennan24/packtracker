@@ -160,9 +160,7 @@
             ]
         };
 
-        let reports = JSON.parse(localStorage.getItem('tcg_reports')) || [
-            { id: 1, storeKey: "smyths-cork", set: "Pokémon: Mega Evolution Perfect Order", status: "Low", note: "Hanger racks filled behind customer service.", flags: 0, timestamp: Date.now(), time: "Just now" }
-        ];
+        let reports = JSON.parse(localStorage.getItem('tcg_reports')) || [];
 
         function openManualAlert() {
             alert(
